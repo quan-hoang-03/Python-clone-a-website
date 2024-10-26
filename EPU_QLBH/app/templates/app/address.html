@@ -1,0 +1,325 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Address{% endblock title %}
+
+
+{% block main-content %}
+<div class="container my-5">
+    <div class="welcome-section">
+        <h3>Welcome <span class="username">{{request.user}}</span></h3>
+    </div>
+    <div class="profile-content">
+        <div class="sidebar">
+            <ul class="nav-menu">
+                <li>
+                    <a href="{% url 'profile' %}" class="nav-link {% if request.path == '/profile/' %}active{% endif %}">
+                        <i class="fas fa-user me-2"></i>Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'address' %}" class="nav-link {% if request.path == '/address/' %}active{% endif %}">
+                        <i class="fas fa-map-marker-alt me-2"></i>Address
+                    </a>
+                </li>
+                <li>
+                    <a href="{%url 'passwordchange' %}" class="nav-link" {% if request.path == '/passwordchange/' %}active{% endif %}>
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="addresses-grid">
+                {% for ad in add %}
+                <div class="address-card">
+                    <div class="card-header">
+                        <div class="header-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <h3>Address {{forloop.counter}}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>Name</label>
+                                <p>{{ad.name}}</p>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>Locality</label>
+                                <p>{{ad.locality}}</p>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>Mobile</label>
+                                <p>{{ad.mobile}}</p>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-city"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>City</label>
+                                <p>{{ad.city}}</p>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-flag"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>State</label>
+                                <p>{{ad.state}}</p>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <i class="fas fa-map-pin"></i>
+                            </div>
+                            <div class="info-content">
+                                <label>Pincode</label>
+                                <p>{{ad.zipcode}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="edit-btn">
+                            <a href="{% url 'updateAddress' id=ad.id %}">
+                                <i class="fas fa-edit"></i>
+                                Sửa
+                            </a>
+                        </button>
+                        <button class="delete-btn">
+                            <i class="fas fa-trash-alt"></i>
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+</div>
+</div>
+<style>
+    .profile-content {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        gap: 2rem;
+    }
+    .welcome-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .welcome-section h3 {
+        margin: 0;
+        color: #333;
+    }
+    .username {
+        color: #007bff;
+        font-weight: 600;
+    }
+    .sidebar {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 34px;
+    }
+    
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .nav-menu li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #666;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+        background-color: #f0f4ff;
+        color: #007bff;
+    }
+    
+    .nav-link.active {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .main-content {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom:34px
+    }
+    
+    .addresses-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .address-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .address-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .header-icon {
+        background: rgba(255,255,255,0.2);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #eee;
+        transition: background-color 0.3s ease;
+    }
+    
+    .info-row:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-icon {
+        color: #007bff;
+        width: 24px;
+        text-align: center;
+    }
+    
+    .info-content {
+        flex: 1;
+    }
+    
+    .info-content label {
+        display: block;
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.2rem;
+    }
+    
+    .info-content p {
+        margin: 0;
+        color: #333;
+        font-weight: 500;
+    }
+    
+    .card-actions {
+        display: flex;
+        padding: 1rem;
+        gap: 1rem;
+        background: #f8f9fa;
+    }
+    
+    .card-actions button {
+        flex: 1;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .edit-btn {
+        background: #007bff;
+    }
+    .edit-btn a{
+        color: white;
+        text-decoration: none;
+    }
+    
+    .edit-btn:hover {
+        background: #0056b3;
+    }
+    
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .delete-btn:hover {
+        background: #c82333;
+    }
+    
+    @media (max-width: 768px) {
+        .addresses-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-actions {
+            flex-direction: column;
+        }
+        
+        .main-content {
+            padding: 1rem;
+        }
+    }
+</style>
+{%endblock main-content%}

@@ -1,0 +1,204 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Customer Registration{% endblock title %}
+{% block main-content %}
+    {% if messages %}
+    <div class="message-container">
+        {% for msg in messages %}
+            <div class="alert {% if msg.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show message-alert" role="alert">
+                <div class="alert-content">
+                    {% if msg.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% else %}
+                        <i class="fas fa-times-circle me-2"></i>
+                    {% endif %}
+                    {{msg}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="row mt-5" style="margin-bottom:6rem">
+            <div class="col-sm-6 offset-sm-3">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h3 class="mb-0">Đăng ký tài khoản</h3>
+                    </div>
+                    <div class="card-body p-5">
+                        <form action="" method="post" novalidate>
+                            {% csrf_token %}
+                            {% for fm in form %}
+                            <div class="form-group mb-4">
+                                {{fm.label_tag}}
+                                {{fm}}
+                                <small class="text-danger">{{fm.errors | striptags}}</small>
+                            </div>
+                            {% endfor %}
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg hover-shadow">
+                                    Đăng ký
+                                    <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+
+                            {% if form.non_field_errors%}
+                                {% for error in form.non_field_errors%}
+                                    <div class="alert alert-danger my-3">{{error}}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<style>
+    .message-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 350px;
+        width: 90%;
+    }
+
+    .message-alert {
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        font-size: 0.95rem;
+    }
+    .alert-dismissible .btn-close {
+        position: absolute;
+        top: 10px;
+        right: 7px;
+        z-index: 2;
+        padding: 1.25rem 1rem;
+    }
+    .btn-close {
+        padding: 12px;
+        margin: -12px -8px -12px auto;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-left: 4px solid #28a745;
+        color: #155724;
+    }
+    .alert-success .fas {
+        color: #28a745;
+    }
+
+    /* Error Alert */
+    .alert-danger {
+        background-color: #f8d7da;
+        border-left: 4px solid #dc3545;
+        color: #721c24;
+    }
+    .alert-danger .fas {
+        color: #dc3545;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    .slide-out {
+        animation: slideOut 0.5s ease-out forwards;
+    }
+
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 576px) {
+        .message-container {
+            right: 10px;
+            left: 10px;
+            max-width: none;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.message-alert');
+    
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.add('slide-out');
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 2000);
+
+        const closeButton = alert.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                alert.classList.add('slide-out');
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            });
+        }
+    });
+});
+</script>
+
+{% endblock main-content %}

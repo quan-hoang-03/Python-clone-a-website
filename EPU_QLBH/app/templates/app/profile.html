@@ -1,0 +1,317 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Login{% endblock title %}
+
+{% block main-content %}
+<div class="profile-container">
+    {% if messages %}
+    <div class="message-container">
+        {% for msg in messages %}
+        <div class="alert {% if msg.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show message-alert"
+            role="alert">
+            <div class="alert-content">
+                {% if msg.tags == 'success' %}
+                <i class="fas fa-check-circle me-2"></i>
+                {% else %}
+                <i class="fas fa-times-circle me-2"></i>
+                {% endif %}
+                {{msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <div class="welcome-section">
+            <h3>Welcome <span class="username">{{request.user}}</span></h3>
+        </div>
+        
+        <div class="profile-content">
+            <div class="sidebar">
+                <ul class="nav-menu">
+                    <li>
+                        <a href="{% url 'profile' %}" class="nav-link {% if request.path == '/profile/' %}active{% endif %}">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'address' %}" class="nav-link {% if request.path == '/address/' %}active{% endif %}">
+                            <i class="fas fa-map-marker-alt me-2"></i>Address
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{%url 'passwordchange' %}" class="nav-link" {% if request.path == '/passwordchange/' %}active{% endif %}>
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="main-content">
+                <div class="form-container">
+                    <form action="" method="post" class="profile-form">
+                        {% csrf_token %}
+                        {% for fm in form %}
+                        <div class="form-group">
+                            {{fm.label_tag}}
+                            {{fm}}
+                            {% if fm.errors %}
+                            <small class="error-message">{{fm.errors | striptags}}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="form-actions">
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-paper-plane me-2"></i>Gửi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    padding: 2rem 0;
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 100px);
+}
+
+.welcome-section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.welcome-section h3 {
+    margin: 0;
+    color: #333;
+}
+
+.username {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.profile-content {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+}
+
+.sidebar {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 34px;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-menu li {
+    margin-bottom: 0.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #666;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: #f0f4ff;
+    color: #007bff;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.main-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom:34px
+}
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.submit-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.submit-btn:hover {
+    background: #0056b3;
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.message-alert {
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease forwards;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.btn-close {
+    margin-left: auto;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.message-alert.slide-out {
+    animation: slideOut 0.5s ease forwards;
+}
+
+@media (max-width: 768px) {
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        margin-bottom: 1rem;
+    }
+
+    .nav-menu {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .nav-menu li {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+}
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.message-alert');
+        
+        alerts.forEach((alert, index) => {
+            setTimeout(() => {
+                hideAlert(alert);
+            }, 2000);
+    
+            const closeButton = alert.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    hideAlert(alert);
+                });
+            }
+        });
+    });
+    
+    function hideAlert(alert) {
+        if (!alert.classList.contains('slide-out')) {
+            alert.classList.add('slide-out');
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }
+    }
+    </script>
+{% endblock main-content%}

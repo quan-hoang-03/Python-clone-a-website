@@ -1,0 +1,23 @@
+Hãy nhớ rằng startproject được sử dụng để tạo một project mới, còn startapp (hoặc python manage.py startapp) được sử dụng để tạo một ứng dụng mới trong project đó.
+
+
+- templates : chứa các trang html
+- views : import tới các trang html để chạy giao diện
+-> Cú pháp : def Home(request):
+    return render(request, 'home.html')
+-> nó giống như chuyển hướng trong mô hình mvc
+
+- urls : gọi tới đường dẫn 
+-> cú pháp :
+ from . import views
+urlpatterns = [
+    path('', views.Home),
+]
+-> gọi tới thằng views để lấy path của từng trang và thực hiện chuyển hướng theo đường dẫn path
+
+* Cách hoạt động :
+
+-> urls : trong file chính -> nó sẽ gọi tới urls trong file app -> urls trong app sẽ gọi tới các trang hiển thị trong templates để hiển thị giao diện
+
+-> python manage.py migrate chạy câu lệnh để cập nhật cơ sở dữ liệu -> chạy trc r mới tới khởi tạo server
+-> python manage.py runserver Khởi động server    

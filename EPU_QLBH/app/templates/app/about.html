@@ -1,0 +1,67 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}About{% endblock title %}
+
+
+{% block banner-slider %}
+  <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      {% for banner in banners %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <img src="{% static banner %}" class="d-block w-100" alt="">
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock banner-slider %}
+{% block main-content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4" style="font-family: 'Arial', sans-serif; font-weight: 700; color: #2c3e50;">Giới thiệu</h2>
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-md-12 col-sm-12">
+            <!-- Phần Giới thiệu về HomeLuxury -->
+            <div class="intro-text bg-light p-5 rounded shadow-sm" style="line-height: 1.8; font-family: 'Arial', sans-serif;">
+                <p class="fs-5 text-left text-muted mb-4">
+                    "Chào mừng bạn đến với <strong>HomeLuxury</strong> - Không gian sống đẳng cấp của người tinh tế!"
+                </p>
+                <p class="fs-5 text-left mb-4">
+                    Tại HomeLuxury, chúng tôi tự hào mang đến những bộ sưu tập nội thất cao cấp và độc đáo, được thiết kế bởi những nghệ nhân hàng đầu. Chúng tôi tập trung vào việc đem lại giá trị thực sự cho không gian sống của bạn, từ phòng khách sang trọng, phòng ngủ ấm cúng, đến các món đồ trang trí tinh tế.
+                </p>
+                <p class="fs-5 text-left mb-4">
+                    Các sản phẩm của chúng tôi không chỉ đẹp về mặt thẩm mỹ mà còn rất tiện dụng, phù hợp với nhu cầu lưu trữ thông minh trong ngôi nhà hiện đại. Mỗi chi tiết đều được chúng tôi chọn lọc kỹ lưỡng để đảm bảo chất lượng và độ bền lâu dài.
+                </p>
+                
+                <p class="fs-5 text-left mb-4">
+                    HomeLuxury không chỉ là nơi mua sắm nội thất. Chúng tôi là người bạn đồng hành đáng tin cậy trong hành trình kiến tạo không gian sống hoàn hảo của bạn. Đội ngũ tư vấn chuyên nghiệp của chúng tôi luôn sẵn sàng hỗ trợ bạn từ khâu lên ý tưởng đến hoàn thiện từng chi tiết nhỏ nhất.
+                </p>
+
+                <div class="row mt-5">
+                    <div class="col-md-6">
+                        <h3 class="text-primary">Lý do chọn HomeLuxury</h3>
+                        <ul class="fs-5 text-left">
+                            <li>Chất liệu cao cấp, độ bền vượt trội.</li>
+                            <li>Thiết kế độc đáo, tinh tế từ các nghệ nhân hàng đầu.</li>
+                            <li>Giải pháp lưu trữ thông minh, tối ưu không gian sống.</li>
+                            <li>Đội ngũ tư vấn và hỗ trợ tận tâm, chuyên nghiệp.</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="text-primary">Dịch vụ của chúng tôi</h3>
+                        <ul class="fs-5 text-left">
+                            <li>Tư vấn thiết kế nội thất miễn phí.</li>
+                            <li>Chế độ bảo hành lâu dài cho các sản phẩm.</li>
+                            <li>Giao hàng nhanh chóng và an toàn.</li>
+                            <li>Đội ngũ lắp đặt chuyên nghiệp, hỗ trợ tận tình.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="fs-5 text-center mt-4">
+                    Khám phá ngay bộ sưu tập mới nhất của chúng tôi và để HomeLuxury biến ngôi nhà trong mơ của bạn thành hiện thực!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+{% endblock main-content %}
