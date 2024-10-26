@@ -21,6 +21,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% if request.user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/">Home</a>
               </li>
@@ -59,7 +60,13 @@
                   <li><a class="dropdown-item" href="{% url 'profile' %}">Xem trang cá nhân</a></li>
                   <li><a class="dropdown-item" href="#">Đặt hàng</a></li>
                   <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Đổi mật khẩu</a></li>
-                  <li><a class="dropdown-item" href="{% url 'login' %}">Đăng xuất</a></li>
+                  {% comment %} Django chỉ cho phép phương thức POST cho logout để đảm bảo an toàn {% endcomment %}
+                  <li>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="dropdown-item">Đăng xuất</button>
+                    </form>
+                </li>
                 </ul>
               </li>
               <li class="nav-item mx-2">
@@ -68,6 +75,7 @@
               <li class="nav-item mx-2">
                 <a href="#" class="nav-item text-white text-decoration-none">Cart</a>
               </li>
+              {% else %}
               <li class="nav-item mx-2">
                 <a href="{% url 'login' %}" class="nav-item text-white text-decoration-none">Login</a>
               </li>
@@ -75,6 +83,7 @@
                 <a href="{% url 'customerregistration' %}" class="nav-item text-white text-decoration-none">Regristration</a>
               </li>
             </ul>
+            {% endif %}
         </div>
       </nav>
     {% block banner-slider %}{% endblock banner-slider %}
