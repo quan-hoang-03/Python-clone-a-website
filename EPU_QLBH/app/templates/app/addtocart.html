@@ -11,7 +11,7 @@
         <div class="card">
             <div class="card-body">
                 <h3>Cart</h3>
-                {%for item in cart%}
+                {% for item in cart %}
                     <div class="row">
                         <div class="col-sm-3 text-center align-self-center"><img src="{{item.product.product_image.url}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" weight="150">
                             
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <hr class="text-muted">
-                {%endfor%}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
                 <h3>Cart</h3>
                 <ul class="list-group">
                     <li class="">Amount<span id="amount">Rs.{{amount}}</span></li>
-                    <li class="">Shopping<span id="amount">Rs.{{amount}}</span></li>
+                    <li class="">Shipping<span id="amount">Rs. 40.0</span></li>
                     <li class="">
                         <div>
                             <strong>Total: </strong><small>{ include GST }</small>
