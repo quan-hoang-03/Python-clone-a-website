@@ -2,13 +2,17 @@ from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.views import View
-from .models import Customer, Product,Cart
+from .models import Customer, Product,Cart,Wishlist
 from .forms import CustomerRegistrationForm,CustomerProfileForm,PaymentForm
 from django.contrib import messages
 from django.db.models import Q
 from .vnpay import vnpay
 from datetime import datetime
+import random
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def get_banner():
     return {
         'banners': [
@@ -20,15 +24,43 @@ def get_banner():
     }
 
 def home(request):
-    context = get_banner()
+    totalitem = 0
+    wishitem = 0
+    
+    if request.user.is_authenticated:
+        totalitem = len(Cart.objects.filter(user=request.user))
+        wishitem = len(Wishlist.objects.filter(user=request.user))
+    
+    # Tạo context từ locals() và merge với banner
+    context = locals()
+    context.update(get_banner())
+    
     return render(request, 'app/home.html', context)
 
 def about(request):
-    context = get_banner()
+    totalitem = 0
+    wishitem = 0
+    
+    if request.user.is_authenticated:
+        totalitem = len(Cart.objects.filter(user=request.user))
+        wishitem = len(Wishlist.objects.filter(user=request.user))
+    
+    context = locals()
+    context.update(get_banner())
+    
     return render(request, 'app/about.html', context)
 
 def contact(request):
-    context = get_banner()
+    totalitem = 0
+    wishitem = 0
+    
+    if request.user.is_authenticated:
+        totalitem = len(Cart.objects.filter(user=request.user))
+        wishitem = len(Wishlist.objects.filter(user=request.user))
+    
+    context = locals()
+    context.update(get_banner())
+    
     return render(request, 'app/contact.html', context)
 
 class CategoryView(View):
@@ -46,6 +78,10 @@ class CategoryTitle(View):
 class ProductDetail(View):
     def get(self,request,pk):
         product = Product.objects.get(pk=pk)
+        wishlist = Wishlist.objects.filter(Q(product=product) & Q(user=request.user))
+        totalitem = 0
+        if request.user.is_authenticated:
+            totalitem = len(Cart.objects.filter(user=request.user))
         return render(request,"app/productdetail.html",locals())
     
     # đăng ký người dùng
@@ -151,45 +187,71 @@ class checkout(View):
             famount = famount + value
         totalamount = famount + 40
         return render(request,"app/checkout.html", locals())
-    
+
+def hmacsha512(key, data):
+    byteKey = key.encode('utf-8')
+    byteData = data.encode('utf-8')
+    return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest() 
  
 def payment(request):
-        inputData = request.GET
-        if inputData:
+    if request.method == 'POST':
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            order_type = form.cleaned_data['order_type']
+            order_id = form.cleaned_data['order_id']
+            amount = form.cleaned_data['amount']
+            order_desc = form.cleaned_data['order_desc']
+            bank_code = form.cleaned_data['bank_code']
+            language = form.cleaned_data['language']
+            ipaddr = get_client_ip(request)
+
+            # Build URL Payment
             vnp = vnpay()
-            vnp.responseData = inputData.dict()
-            order_id = inputData['vnp_TxnRef']
-            amount = int(inputData['vnp_Amount']) / 100
-            order_desc = inputData['vnp_OrderInfo']
-            vnp_TransactionNo = inputData['vnp_TransactionNo']
-            vnp_ResponseCode = inputData['vnp_ResponseCode']
-            vnp_TmnCode = inputData['vnp_TmnCode']
-            vnp_PayDate = inputData['vnp_PayDate']
-            vnp_BankCode = inputData['vnp_BankCode']
-            vnp_CardType = inputData['vnp_CardType']
-            if vnp.validate_response(settings.VNPAY_HASH_SECRET_KEY):
-                if vnp_ResponseCode == "00":
-                    return render(request, "payment_return.html", {"title": "Kết quả thanh toán",
-                                                                   "result": "Thành công", "order_id": order_id,
-                                                                   "amount": amount,
-                                                                   "order_desc": order_desc,
-                                                                   "vnp_TransactionNo": vnp_TransactionNo,
-                                                                   "vnp_ResponseCode": vnp_ResponseCode})
-                else:
-                    return render(request, "payment_return.html", {"title": "Kết quả thanh toán",
-                                                                   "result": "Lỗi", "order_id": order_id,
-                                                                   "amount": amount,
-                                                                   "order_desc": order_desc,
-                                                                   "vnp_TransactionNo": vnp_TransactionNo,
-                                                                   "vnp_ResponseCode": vnp_ResponseCode})
-            else:
-                return render(request, "app/payment.html",
-                              {"title": "Kết quả thanh toán", "result": "Lỗi", "order_id": order_id, "amount": amount,
-                               "order_desc": order_desc, "vnp_TransactionNo": vnp_TransactionNo,
-                               "vnp_ResponseCode": vnp_ResponseCode, "msg": "Sai checksum"})
-        else:
-            return render(request, "app/payment.html", {"title": "Kết quả thanh toán", "result": ""})
+            vnp.requestData['vnp_Version'] = '2.1.0'
+            vnp.requestData['vnp_Command'] = 'pay'
+            vnp.requestData['vnp_TmnCode'] = settings.VNPAY_TMN_CODE
+            vnp.requestData['vnp_Amount'] = amount * 100
+            vnp.requestData['vnp_CurrCode'] = 'VND'
+            vnp.requestData['vnp_TxnRef'] = order_id
+            vnp.requestData['vnp_OrderInfo'] = order_desc
+            vnp.requestData['vnp_OrderType'] = order_type
             
+            # Check language
+            if language and language != '':
+                vnp.requestData['vnp_Locale'] = language
+            else:
+                vnp.requestData['vnp_Locale'] = 'vn'
+
+            # Check bank_code
+            if bank_code and bank_code != "":
+                vnp.requestData['vnp_BankCode'] = bank_code
+
+            vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
+            vnp.requestData['vnp_IpAddr'] = ipaddr
+            vnp.requestData['vnp_ReturnUrl'] = settings.VNPAY_RETURN_URL
+            
+            vnpay_payment_url = vnp.get_payment_url(settings.VNPAY_PAYMENT_URL, settings.VNPAY_HASH_SECRET_KEY)
+            print(vnpay_payment_url)
+            return redirect(vnpay_payment_url)
+        else:
+            print("Form input not validate")
+            return render(request, "app/payment.html", {"title": "Thanh toán", "form": form})  # Trả về form với thông tin lỗi
+    else:
+        form = PaymentForm()  # Tạo form mới cho GET request
+        return render(request, "app/payment.html", {"title": "Thanh toán", "form": form})  # Trả về trang thanh toán với form
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+n = random.randint(10**11, 10**12 - 1)
+n_str = str(n)
+while len(n_str) < 12:
+    n_str = '0' + n_str       
 
 def  plus_cart(request):
     if request.method == 'GET':
@@ -251,3 +313,34 @@ def  remove_cart(request):
             'totalamount' : totalamount,
         }
         return JsonResponse(data)
+    
+def plus_wishlist(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        product = Product.objects.get(id=prod_id)
+        user = request.user
+        Wishlist(user=user,product=product).save()
+        data={
+            'message':'Đã thêm vào danh mục yêu thích'
+        }
+        return JsonResponse(data)
+def minus_wishlist(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        product = Product.objects.get(id=prod_id)
+        user = request.user
+        Wishlist.objects.filter(user=user,product=product).delete()
+        data={
+            'message':'Đã xóa khỏi danh mục yêu thích'
+        }
+        return JsonResponse(data)
+def search(request):
+    query = request.GET['search']
+    product = Product.objects.filter(Q(title_icontains=query))
+    totalitem = 0
+    wishitem = 0
+    
+    if request.user.is_authenticated:
+        totalitem = len(Cart.objects.filter(user=request.user))
+        wishitem = len(Wishlist.objects.filter(user=request.user))
+    return render(request,'app/search.html',locals())

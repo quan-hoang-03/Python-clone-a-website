@@ -3,27 +3,407 @@
 {% block title %}Category{% endblock title %}
 
 {% block main-content %}
-    <div class="container">
-        <div class="row flex justify-content-between">
-            <div class="img2 col-lg-5 mt-5">
-                <img src="{{product.product_image.url}}" class="image col-xs-6 col-sm-12 col-lg-12 mt-3 text-sm-center w-100 h-75" alt="">
+<div class="product-detail-container">
+    {% if messages %}
+    <div class="message-container">
+        {% for msg in messages %}
+        <div class="alert {% if msg.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show message-alert"
+            role="alert">
+            <div class="alert-content">
+                {% if msg.tags == 'success' %}
+                <i class="fas fa-check-circle me-2"></i>
+                {% else %}
+                <i class="fas fa-times-circle me-2"></i>
+                {% endif %}
+                {{msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <div class="productdetail col-lg-5">
-                <h1 style="font-family: Georgia; font-size:50px">{{product.title}}</h1>
-                <h5>Rs.{{product.discount_price}}/-</h5>
-                <small class="fs-5 text-decoration-line-through text-muted"><del>Rs.{{product.selling_price}}/-</small></del>
-                <br><br><h4>Product Features</h4>
-                <ul class="fs-5" style="font-family:Rajdhani">
-                    <li>{{product.description}}</li>
-                </ul>
-                <form action="/add-to-cart" class="d-inline">
-                    <input type="hidden" name="prod_id" value="{{ product.id }}"/>
-                    <button type="submit" class="btn btn-primary showdow px-5 py-2">
-                        Thêm vào giỏ hàng
-                    </button>
-                </form>
-                    <a href="{% url 'showcart' %}" class="btn btn-warning showdow px-5 py-2">Mua ngay</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="container py-5">
+        <div class="row">
+            <!-- Product Image Section -->
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="product-image-wrapper">
+                    <div class="image-zoom-wrapper">
+                        <img src="{{product.product_image.url}}" class="product-image" alt="{{product.title}}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Info Section -->
+            <div class="col-lg-6">
+                <div class="product-info">
+                    <h1 class="product-title">{{product.title}}</h1>
+                    
+                    <div class="price-section">
+                        <div class="price-container">
+                            <div class="current-price">
+                                <span class="amount">{{product.discount_price}}</span>
+                                <span class="currency">₫</span>
+                            </div>
+                            {% if product.selling_price > product.discount_price %}
+                            <div class="discount-info">
+                                <div class="original-price">
+                                    <del>{{product.selling_price}}₫</del>
+                                </div>
+                                <div class="discount-tag">-{{product.discount_percentage}}%</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if product.selling_price > product.discount_price %}
+                        <div class="savings-info">
+                            Tiết kiệm: <span>{{product.saving_amount}}₫</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-features">
+                        <h4 class="features-title">Đặc điểm nổi bật</h4>
+                        <div class="features-content">
+                            {{product.description|linebreaks}}
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <div class="primary-actions">
+                            <form action="/add-to-cart" class="d-inline">
+                                <input type="hidden" name="prod_id" value="{{ product.id }}"/>
+                                <button type="submit" class="btn-add-cart">
+                                    <i class="fas fa-shopping-cart me-2"></i>
+                                    Thêm vào giỏ hàng
+                                </button>
+                            </form>
+                            <a href="{% url 'showcart' %}" class="btn-buy-now">
+                                <i class="fas fa-bolt me-2"></i>
+                                Mua ngay
+                            </a>
+                        </div>
+                        
+                        <div class="wishlist-action">
+                            {% if wishlist %}
+                            <button pid="{{product.id}}" class="btn-wishlist minus-wishlist active">
+                                <i class="fas fa-heart"></i>
+                                <span>Đã thích</span>
+                            </button>
+                            {% else %}
+                            <button pid="{{product.id}}" class="btn-wishlist plus-wishlist">
+                                <i class="fas fa-heart"></i>
+                                <span>Thêm vào yêu thích</span>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<style>
+.product-detail-container {
+    background-color: #f8f9fa;
+    padding: 30px 0;
+}
+/*Message */
+.message-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.message-alert {
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease forwards;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.btn-close {
+    margin-left: auto;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.message-alert.slide-out {
+    animation: slideOut 0.5s ease forwards;
+}
+/* Product Image Styles */
+.product-image-wrapper {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+}
+
+.product-image-wrapper:hover {
+    transform: translateY(-5px);
+}
+
+.image-zoom-wrapper {
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.05);
+}
+
+/* Product Info Styles */
+.product-info {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.product-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+/* Price Section */
+.price-section {
+    margin: 20px 0;
+    padding: 15px 20px;
+    background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.price-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.current-price {
+    display: flex;
+    align-items: baseline;
+}
+
+.current-price .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ee4d2d;
+    letter-spacing: -0.5px;
+}
+
+.current-price .currency {
+    font-size: 1.2rem;
+    color: #ee4d2d;
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+.discount-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.original-price {
+    color: #999;
+    font-size: 1rem;
+}
+
+.original-price del {
+    font-weight: 400;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.discount-tag {
+    background: #ee4d2d;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.savings-info {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #757575;
+}
+
+.savings-info span {
+    color: #ee4d2d;
+    font-weight: 500;
+}
+
+/* Hover effect */
+.price-section:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .price-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .current-price .amount {
+        font-size: 1.75rem;
+    }
+    
+    .discount-info {
+        margin-left: 2px;
+    }
+}
+
+/* Product Features */
+.features-title {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    margin: 25px 0 15px;
+    font-weight: 600;
+}
+
+.features-content {
+    color: #576574;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.primary-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-add-cart, .btn-buy-now {
+    flex: 1;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-add-cart {
+    background: #3498db;
+    color: white;
+}
+
+.btn-add-cart:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-buy-now {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-buy-now:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+.btn-wishlist {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e74c3c;
+    border-radius: 10px;
+    background: transparent;
+    color: #e74c3c;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-wishlist:hover, .btn-wishlist.active {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .product-title {
+        font-size: 2rem;
+    }
+    
+    .primary-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-detail-container {
+        padding: 15px 0;
+    }
+    
+    .product-info {
+        padding: 20px;
+    }
+    
+    .product-title {
+        font-size: 1.75rem;
+    }
+}
+</style>
 {% endblock main-content %}

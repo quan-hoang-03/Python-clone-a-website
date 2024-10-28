@@ -45,8 +45,9 @@ class CustomerProfileForm(forms.ModelForm):
         }
 
 class PaymentForm(forms.Form):
-    order_id = forms.CharField(max_length=100, required=True)
-    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
-    order_desc = forms.CharField(widget=forms.Textarea, required=True)
-    bank_code = forms.CharField(max_length=10, required=False)
-    language = forms.ChoiceField(choices=[('vn', 'Tiếng Việt'), ('en', 'English')], required=False)
+    order_id = forms.CharField(max_length=250)
+    order_type = forms.CharField(max_length=20)
+    amount = forms.IntegerField()
+    order_desc = forms.CharField(max_length=100)
+    bank_code = forms.CharField(max_length=20, required=False)
+    language = forms.CharField(max_length=2)

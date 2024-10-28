@@ -32,8 +32,18 @@ class Product(models.Model):
     prodapp = models.TextField(default='')
     category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
     product_image = models.ImageField(upload_to='product')
+    saving_amount = models.FloatField()
+    discount_percentage = models.FloatField()
     def __str__(self):
         return self.title
+    @property
+    def saving_amount(self):
+        return self.selling_price - self.discount_price if self.selling_price > self.discount_price else 0
+    @property
+    def discount_percentage(self):
+        if self.selling_price > 0: 
+            return round((self.saving_amount / self.selling_price) * 100, 2)
+        return 0
     
 class Customer(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -74,3 +84,7 @@ class OrderPlaced(models.Model):
     @property
     def total_cost(self):
         return self.quantity * self.product.discount_price
+    
+class Wishlist(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)

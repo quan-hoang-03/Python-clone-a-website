@@ -11,7 +11,7 @@
     <title>Quân Hoàng {%block title %}{% endblock title %}</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success" style="padding: 0 15px">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
             <img src="{% static "app/images/products/Neel.png" %}" style="width:70px;height:70px">
@@ -41,7 +41,7 @@
                 <a class="nav-link text-white" href="{% url 'contact' %}">Liên hệ</a>
               </li>
             </ul>
-            <form class="search-form">
+            <form class="search-form" role="search" action="/search">
               <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
                 <input class="search-input" type="search" placeholder="Tìm kiếm..." aria-label="Search">
@@ -70,10 +70,10 @@
                 </ul>
               </li>
               <li class="nav-item mx-2">
-                <a href="#" class="nav-item text-white text-decoration-none">Cart</a>
+                <a href="{% url 'showcart' %}" class="nav-item text-white text-decoration-none">Cart</a>
               </li>
               <li class="nav-item mx-2">
-                <a href="#" class="nav-item text-white text-decoration-none">Cart</a>
+                <a href="#" class="nav-item text-white"><span class="badge bg-danger">{%if wishitem > 0 %} {{wishitem}} {% endif %}</span><i class="fa fa-heart"></i></a>
               </li>
               {% else %}
               <li class="nav-item mx-2">
