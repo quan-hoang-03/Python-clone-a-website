@@ -1,0 +1,11 @@
+{% extends 'app/base.html' %}
+{% block main-content %}
+<div class="container">
+    <h2>Thanh toán</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-warning">Thanh toán</button>
+    </form>
+</div>
+{% endblock %}

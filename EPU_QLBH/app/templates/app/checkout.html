@@ -1,0 +1,98 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Checkout{% endblock title %}
+
+{% block main-content %}
+<div class="container" style="margin-bottom: 70px;">
+    {% if messages %}
+    <div class="message-container">
+        {% for msg in messages %}
+        <div class="alert {% if msg.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show message-alert"
+            role="alert">
+            <div class="alert-content">
+                {% if msg.tags == 'success' %}
+                <i class="fas fa-check-circle me-2"></i>
+                {% else %}
+                <i class="fas fa-times-circle me-2"></i>
+                {% endif %}
+                {{msg}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div class="row mt-5">
+        <div class="col-sm-6">
+            <h4>Các đơn hàng</h4>
+            <hr>
+            {% for item in cart_items %}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <p>Sản phẩm: {{item.product.title}}</p>
+                    <p>Số lượng: {{item.quantity}}</p>
+                    <p>Giá: {{item.product.discount_price}}</p>
+                </div>
+            </div>
+            {% endfor %} 
+            <p class="fw-bold">Tổng chi phí + Rs.40 = {{totalamount}}</p>
+            <small>Điều khoản và Điều kiện: Lorem ipsum dolor sit amet, một phần của văn bản được sử dụng để thể hiện nội dung. Những điều này thường liên quan đến trách nhiệm pháp lý, quyền lợi và nghĩa vụ của người dùng</small>
+        </div>
+        <div class="col-sm-4 offset-sm-1">
+            <h4>Select Shipping Address</h4>
+            <hr>
+            <form method="post" id="myform">
+                {% csrf_token %}
+                {% for ad in add %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{{ad.name}}</h5>
+                        <p>Mobile : {{ad.mobile}}</p>
+                        <p>{{ad.locality}} {{ad.city}} - {{ad.zipcode}}</p>
+                    </div>
+                </div>
+                <div class="form-check mt-2 mb-5">
+                    <input class="form-check-input" type="radio" name="custid" id="custad{{forloop.counter}}" value="{{ad.id}}">
+                    <label class="form-check-label fw-bold" for="custad{{forloop.counter}}">
+                        Address{{forloop.counter}}
+                    </label>
+                </div>
+                {% endfor %}
+                <div class="form-check mb-3">
+                    <label for="totalamount" class="form-label">Total Amount:</label>
+                    <input type="number" class="form-control" name="totamount" value="{{totalamount}}" readonly/>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Tiếp tục</button>
+                    <button type="submit" formaction="{% url 'payment' %}" class="btn btn-warning mt-3 px-5 fw-bold">Thanh toán</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .message-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        min-width: 300px;
+    }
+    
+    .message-alert {
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        animation: slideIn 0.5s ease forwards;
+    }
+    
+    .alert-content {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+    }
+    
+    .btn-close {
+        margin-left: auto;
+    }
+</style>
+{% endblock main-content %}

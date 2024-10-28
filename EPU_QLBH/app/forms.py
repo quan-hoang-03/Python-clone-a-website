@@ -43,3 +43,10 @@ class CustomerProfileForm(forms.ModelForm):
             'state' : forms.Select(attrs={'class':'form-control'}),
             'zipcode': forms.NumberInput(attrs={'class':'form-control'}),
         }
+
+class PaymentForm(forms.Form):
+    order_id = forms.CharField(max_length=100, required=True)
+    amount = forms.DecimalField(max_digits=10, decimal_places=2, required=True)
+    order_desc = forms.CharField(widget=forms.Textarea, required=True)
+    bank_code = forms.CharField(max_length=10, required=False)
+    language = forms.ChoiceField(choices=[('vn', 'Tiếng Việt'), ('en', 'English')], required=False)

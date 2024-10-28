@@ -1,65 +1,135 @@
 {% extends 'app/base.html' %}
 {% load static %}
-{% block title %}Cart{% endblock title %}
+{% block title %}Shopping Cart{% endblock title %}
 
 {% block main-content %}
-<div class="container my-5">
-    <div class="row">
-    {%if cart %}
-    <h1 class="text-center mb-5">Shopping Cart</h1>
-    <div class="col-sm-8">
-        <div class="card">
-            <div class="card-body">
-                <h3>Cart</h3>
-                {% for item in cart %}
-                    <div class="row">
-                        <div class="col-sm-3 text-center align-self-center"><img src="{{item.product.product_image.url}}" alt="" srcset="" class="img-fluid img-thumbnail shadow-sm" height="150" weight="150">
-                            
+<div class="container py-5">
+    {% if cart %}
+    <h1 class="text-center mb-5 fw-bold text-primary">Your Shopping Cart</h1>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4 fw-bold">Cart Items</h3>
+                    {% for item in cart %}
+                    <div class="row mb-4 align-items-center">
+                        <div class="col-md-3">
+                            <div class="rounded-3 overflow-hidden">
+                                <img src="{{item.product.product_image.url}}" 
+                                     alt="{{item.product.title}}" 
+                                     class="img-fluid hover-zoom"
+                                     style="aspect-ratio: 1; object-fit: cover;">
+                            </div>
                         </div>
-                        <div class="col-sm-9">
-                            <div>
-                                <h5>{{item.product.title}}</h5>
-                                <p class="mb-2 text-muted small">{{item.product.description}}</p>
-                                <div class="my-3">
-                                    <label for="quantity">Quantity :</label>
-                                    <a class="minus-cart btn" pid={{item.product.id}}><i class="fas fa-minus-square fa-lg"></i></a>
-                                    <span id="quantity">{{item.quantity}}</span>
-                                    <a class="plus-cart btn" pid={{item.product.id}}><i class="fas fa-plus-square fa-lg"></i></a>
+                        <div class="col-md-9">
+                            <div class="d-flex flex-column h-100">
+                                <h5 class="fw-bold mb-2">{{item.product.title}}</h5>
+                                <p class="text-muted small mb-3">{{item.product.description}}</p>
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <label class="me-3 fw-medium">Quantity:</label>
+                                    <div class="input-group input-group-sm" style="width: 120px;">
+                                        <button class="btn btn-outline-secondary minus-cart" type="button" pid="{{item.product.id}}">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <span class="form-control text-center" id="quantity">{{item.quantity}}</span>
+                                        <button class="btn btn-outline-secondary plus-cart" type="button" pid="{{item.product.id}}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <a href="#" class="remove-cart btn btn-sm btn-secondary" pid={{item.product.id}}>Remove item</a>
-                                    <p class="mb-0"><span><strong>Rs. {{item.product.discount_price}}</strong></span></p>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <button class="btn btn-sm btn-outline-danger remove-cart" pid="{{item.product.id}}">
+                                        <i class="fas fa-trash-alt me-2"></i>Remove
+                                    </button>
+                                    <p class="h5 mb-0 text-primary fw-bold">Rs. {{item.product.discount_price}}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% if not forloop.last %}
                     <hr class="text-muted">
-                {% endfor %}
+                    {% endif %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-sm-4">
-        <div class="card">
-            <div class="card-body">
-                <h3>Cart</h3>
-                <ul class="list-group">
-                    <li class="">Amount<span id="amount">Rs.{{amount}}</span></li>
-                    <li class="">Shipping<span id="amount">Rs. 40.0</span></li>
-                    <li class="">
-                        <div>
-                            <strong>Total: </strong><small>{ include GST }</small>
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4 fw-bold">Order Summary</h3>
+                    <div class="list-group list-group-flush mb-4">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Subtotal</span>
+                            <span class="fw-bold" id="amount">Rs. {{amount}}</span>
                         </div>
-                        <span id="totalamount"><strong>Rs. {{totalamount}}</strong></span>
-                    </li>
-                </ul>
-                <div class="d-grid"><a href="{% url 'checkout' %}" class="btn btn-primary">Place Order</a></div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Shipping</span>
+                            <span class="fw-bold">Rs. 40.0</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <div>
+                                <span class="fw-bold">Total</span>
+                                <small class="text-muted d-block">Including GST</small>
+                            </div>
+                            <span class="h5 mb-0 text-success fw-bold" id="totalamount">Rs. {{totalamount}}</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'checkout' %}" 
+                       class="btn btn-primary w-100 btn-lg fw-bold">
+                        <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     {% else %}
-    <h1>Cart is empty</h1>
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+        <h2 class="fw-bold text-muted">Your Cart is Empty</h2>
+        <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+        </a>
+    </div>
     {% endif %}
 </div>
-</div>
+
+<style>
+.hover-zoom {
+    transition: transform 0.3s ease;
+}
+.hover-zoom:hover {
+    transform: scale(1.05);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.list-group-item {
+    background: transparent;
+    border-color: rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
 {% endblock main-content %}

@@ -1,11 +1,13 @@
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.views import View
 from .models import Customer, Product,Cart
-from .forms import CustomerRegistrationForm,CustomerProfileForm
+from .forms import CustomerRegistrationForm,CustomerProfileForm,PaymentForm
 from django.contrib import messages
 from django.db.models import Q
+from .vnpay import vnpay
+from datetime import datetime
 
 def get_banner():
     return {
@@ -110,9 +112,22 @@ class updateAddress(View):
 def add_to_cart(request):
     user = request.user
     product_id = request.GET.get('prod_id')
-    product = Product.objects.get(id=product_id)
-    Cart(user=user, product=product).save()
-    return redirect("/cart")
+
+    if product_id:
+        try:
+            # Chỉ giữ lại phần số
+            product_id = int(product_id.rstrip('/'))
+            product = Product.objects.get(id=product_id)
+
+            Cart(user=user, product=product).save()
+            return redirect("/cart")
+
+        except ValueError:
+            return HttpResponse("Invalid product ID.", status=400)
+        except Product.DoesNotExist:
+            return HttpResponse("Product not found.", status=404)
+
+    return HttpResponse("Product ID not provided.", status=400)
 
 def show_cart(request):
     user = request.user
@@ -127,7 +142,54 @@ def show_cart(request):
 
 class checkout(View):
     def get(self,request):
+        user = request.user
+        add = Customer.objects.filter(user=user)
+        cart_items = Cart.objects.filter(user=user)
+        famount = 0 
+        for p in cart_items:
+            value = p.quantity * p.product.discount_price
+            famount = famount + value
+        totalamount = famount + 40
         return render(request,"app/checkout.html", locals())
+    
+ 
+def payment(request):
+        inputData = request.GET
+        if inputData:
+            vnp = vnpay()
+            vnp.responseData = inputData.dict()
+            order_id = inputData['vnp_TxnRef']
+            amount = int(inputData['vnp_Amount']) / 100
+            order_desc = inputData['vnp_OrderInfo']
+            vnp_TransactionNo = inputData['vnp_TransactionNo']
+            vnp_ResponseCode = inputData['vnp_ResponseCode']
+            vnp_TmnCode = inputData['vnp_TmnCode']
+            vnp_PayDate = inputData['vnp_PayDate']
+            vnp_BankCode = inputData['vnp_BankCode']
+            vnp_CardType = inputData['vnp_CardType']
+            if vnp.validate_response(settings.VNPAY_HASH_SECRET_KEY):
+                if vnp_ResponseCode == "00":
+                    return render(request, "payment_return.html", {"title": "Kết quả thanh toán",
+                                                                   "result": "Thành công", "order_id": order_id,
+                                                                   "amount": amount,
+                                                                   "order_desc": order_desc,
+                                                                   "vnp_TransactionNo": vnp_TransactionNo,
+                                                                   "vnp_ResponseCode": vnp_ResponseCode})
+                else:
+                    return render(request, "payment_return.html", {"title": "Kết quả thanh toán",
+                                                                   "result": "Lỗi", "order_id": order_id,
+                                                                   "amount": amount,
+                                                                   "order_desc": order_desc,
+                                                                   "vnp_TransactionNo": vnp_TransactionNo,
+                                                                   "vnp_ResponseCode": vnp_ResponseCode})
+            else:
+                return render(request, "app/payment.html",
+                              {"title": "Kết quả thanh toán", "result": "Lỗi", "order_id": order_id, "amount": amount,
+                               "order_desc": order_desc, "vnp_TransactionNo": vnp_TransactionNo,
+                               "vnp_ResponseCode": vnp_ResponseCode, "msg": "Sai checksum"})
+        else:
+            return render(request, "app/payment.html", {"title": "Kết quả thanh toán", "result": ""})
+            
 
 def  plus_cart(request):
     if request.method == 'GET':
