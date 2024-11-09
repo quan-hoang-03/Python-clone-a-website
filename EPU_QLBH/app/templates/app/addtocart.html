@@ -41,9 +41,11 @@
                                 
                                 <div class="d-flex justify-content-between align-items-center mt-auto">
                                     <button class="btn btn-sm btn-outline-danger remove-cart" pid="{{item.product.id}}">
-                                        <i class="fas fa-trash-alt me-2"></i>Remove
+                                        <i class="fas fa-trash-alt me-2"></i>Xóa
                                     </button>
-                                    <p class="h5 mb-0 text-primary fw-bold">Rs. {{item.product.discount_price}}</p>
+                                    <p class="h5 mb-0 text-primary fw-bold price-format" data-price="{{ item.product.discount_price }}">
+                                        {{ item.product.discount_price }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -59,28 +61,28 @@
         <div class="col-lg-4">
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-body p-4">
-                    <h3 class="card-title mb-4 fw-bold">Order Summary</h3>
+                    <h3 class="card-title mb-4 fw-bold">Đơn hàng</h3>
                     <div class="list-group list-group-flush mb-4">
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Subtotal</span>
-                            <span class="fw-bold" id="amount">Rs. {{amount}}</span>
+                            <span>Tổng tiền sản phẩm</span>
+                            <span class="fw-bold price-format" data-price="{{ amount }}">{{ amount }}</span>
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span>Shipping</span>
-                            <span class="fw-bold">Rs. 40.0</span>
+                            <span class="fw-bold price-format" data-price="40000">40.000đ</span>
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <div>
-                                <span class="fw-bold">Total</span>
-                                <small class="text-muted d-block">Including GST</small>
+                                <span class="fw-bold">Tổng đơn</span>
+                                <small class="text-muted d-block">Bao gồm cả ship</small>
                             </div>
-                            <span class="h5 mb-0 text-success fw-bold" id="totalamount">Rs. {{totalamount}}</span>
+                            <span class="h5 mb-0 text-success fw-bold price-format" data-price="{{ totalamount }}">{{ totalamount }}</span>
                         </div>
                     </div>
-                    
-                    <a href="{% url 'checkout' %}" 
+
+                    <a href="{% url 'checkout' %}"
                        class="btn btn-primary w-100 btn-lg fw-bold">
-                        <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                        <i class="fas fa-lock me-2"></i>Tiến hành thanh toán
                     </a>
                 </div>
             </div>
@@ -132,4 +134,27 @@
     }
 }
 </style>
+<script>
+    // Hàm định dạng giá thành VNĐ
+    function formatVNDPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    // Chờ khi DOM đã tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chọn tất cả các phần tử có class 'price-format'
+        const priceElements = document.querySelectorAll('.price-format');
+
+        priceElements.forEach(element => {
+            // Lấy giá từ thuộc tính data-price
+            const price = parseInt(element.dataset.price);
+
+            // Định dạng lại và thay thế nội dung
+            element.textContent = formatVNDPrice(price);
+        });
+    });
+</script>
 {% endblock main-content %}

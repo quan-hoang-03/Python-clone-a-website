@@ -67,11 +67,39 @@ def contact(request):
 @method_decorator(login_required,name='dispatch')
 class CategoryView(View):
     def get(self, request, val):
-        # Khởi tạo queryset ban đầu
-        products = Product.objects.filter(category=val)
-        
+        # Định nghĩa mapping cho danh mục cha và con
+        category_mapping = {
+            'PA': {
+                'name': 'Phòng ăn',
+                'subcategories': {
+                    'PA-BA': 'Bàn ăn',
+                    'PA-GHE': 'Ghế ăn',
+                    'PA-TU': 'Tủ trang trí'
+                }
+            }
+        }
+
+        # Xử lý đặc biệt cho danh mục phòng ăn và các danh mục con
+        if val == 'PA':
+            # Lấy subcategory từ request
+            subcategory = request.GET.get('subcategory', '')
+            if subcategory and subcategory in category_mapping['PA']['subcategories']:
+                # Nếu có chọn subcategory thì chỉ lấy sản phẩm của subcategory đó
+                products = Product.objects.filter(category=subcategory)
+            else:
+                # Nếu không có subcategory thì lấy tất cả
+                products = Product.objects.filter(
+                    Q(category='PA') |
+                    Q(category='PA-BA') |
+                    Q(category='PA-GHE') |
+                    Q(category='PA-TU')
+                )
+        else:
+            # Với các danh mục khác, giữ nguyên logic cũ
+            products = Product.objects.filter(category=val)
+
         # Lấy danh sách titles cho category này
-        title = Product.objects.filter(category=val).values('title').annotate(total=Count('title'))
+        title = products.values('title').annotate(total=Count('title'))
 
         # Xử lý tìm kiếm theo tên
         search_query = request.GET.get('search', '')
@@ -84,13 +112,13 @@ class CategoryView(View):
         # Xử lý tìm kiếm theo khoảng giá
         min_price = request.GET.get('min_price')
         max_price = request.GET.get('max_price')
-        
+
         if min_price:
             try:
                 products = products.filter(discount_price__gte=float(min_price))
             except ValueError:
                 pass
-        
+
         if max_price:
             try:
                 products = products.filter(discount_price__lte=float(max_price))
@@ -109,9 +137,14 @@ class CategoryView(View):
             elif sort_by == 'name_desc':
                 products = products.order_by('-title')
 
+        # Lấy thông tin subcategories nếu đang ở category cha
+        subcategories = []
+        if val in category_mapping:
+            subcategories = [(code, name) for code, name in category_mapping[val]['subcategories'].items()]
+
         # Phân trang
         from django.core.paginator import Paginator
-        paginator = Paginator(products, 8)  # Hiển thị 8 sản phẩm mỗi trang
+        paginator = Paginator(products, 8)
         page_number = request.GET.get('page')
         product = paginator.get_page(page_number)
 
@@ -123,6 +156,8 @@ class CategoryView(View):
             'min_price': min_price,
             'max_price': max_price,
             'sort_by': sort_by,
+            'subcategories': subcategories,  # Thêm danh sách subcategories vào context
+            'selected_subcategory': request.GET.get('subcategory', '')  # Subcategory đang được chọn
         }
         
         return render(request, "app/category.html", context)

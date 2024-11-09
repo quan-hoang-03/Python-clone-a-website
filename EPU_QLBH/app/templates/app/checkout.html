@@ -31,11 +31,13 @@
                 <div class="card-body">
                     <p>Sản phẩm: {{item.product.title}}</p>
                     <p>Số lượng: {{item.quantity}}</p>
-                    <p>Giá: {{item.product.discount_price}}</p>
+                    <p class="price-format" data-price="{{item.product.discount_price}}">Giá: {{item.product.discount_price}}</p>
                 </div>
             </div>
-            {% endfor %} 
-            <p class="fw-bold">Tổng chi phí + Rs.40 = {{totalamount}}</p>
+            {% endfor %}
+            <p class="fw-bold price-format" data-price="{{totalamount}}">
+                Tổng chi phí + 40.000đ = {{totalamount}}
+            </p>
             <small>Điều khoản và Điều kiện: Lorem ipsum dolor sit amet, một phần của văn bản được sử dụng để thể hiện nội dung. Những điều này thường liên quan đến trách nhiệm pháp lý, quyền lợi và nghĩa vụ của người dùng</small>
         </div>
         <div class="col-sm-4 offset-sm-1">
@@ -60,7 +62,8 @@
                 {% endfor %}
                 <div class="form-check mb-3">
                     <label for="totalamount" class="form-label">Total Amount:</label>
-                    <input type="number" class="form-control" name="totamount" value="{{totalamount}}" readonly/>
+                    <input type="number" class="form-control" name="totamount" value="{{totalamount}}" readonly
+                           data-price="{{totalamount}}"/>
                 </div>
                 <div class="text-end">
                     <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Tiếp tục</button>
@@ -95,4 +98,27 @@
         margin-left: auto;
     }
 </style>
+<script>
+    // Hàm định dạng giá thành VNĐ
+    function formatVNDPrice(price) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    }
+
+    // Chờ khi DOM đã tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        // Chọn tất cả các phần tử có class 'price-format'
+        const priceElements = document.querySelectorAll('.price-format');
+
+        priceElements.forEach(element => {
+            // Lấy giá từ thuộc tính data-price
+            const price = parseInt(element.dataset.price);
+
+            // Định dạng lại và thay thế nội dung
+            element.textContent = formatVNDPrice(price);
+        });
+    });
+</script>
 {% endblock main-content %}

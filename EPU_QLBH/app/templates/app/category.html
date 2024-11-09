@@ -10,6 +10,7 @@
             <div class="card">
                 <div class="card-body">
                     <form method="GET" class="row g-3">
+
                         <!-- Search input -->
                         <div class="col-md-4">
                             <input type="text" name="search" class="form-control" 
@@ -20,12 +21,24 @@
                         <!-- Price range -->
                         <div class="col-md-6">
                             <div class="row">
+                                {% if subcategories %}
                                 <div class="col">
-                                    <input type="number" name="min_price" class="form-control" 
+                                    <select name="subcategory" class="form-select">
+                                        <option value="">Danh mục con</option>
+                                        {% for code, name in subcategories %}
+                                        <option value="{{ code }}" {% if selected_subcategory == code %}selected{% endif %}>
+                                            {{ name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% endif %}
+                                <div class="col">
+                                    <input type="number" name="min_price" class="form-control"
                                            placeholder="Giá từ" value="{{ min_price }}">
                                 </div>
                                 <div class="col">
-                                    <input type="number" name="max_price" class="form-control" 
+                                    <input type="number" name="max_price" class="form-control"
                                            placeholder="Giá đến" value="{{ max_price }}">
                                 </div>
                             </div>

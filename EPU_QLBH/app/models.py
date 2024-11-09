@@ -3,10 +3,13 @@ from django.contrib.auth.models import User
 
 CATEGORY_CHOICES=(
     ('ML','Sofa'),
-    ('CZ','Bàn ghế'),
-    ('BD','Giường ngủ'),
-    ('TG','Tủ giày'),
-    ('BA','Bàn ăn'),
+    ('CZ','Phòng khách'),
+    ('BD','Phòng ngủ'),
+    ('TB','Tủ Bếp'),
+    ('PA','Phòng ăn'),
+    ('PA-BA','Bàn ăn'),
+    ('PA-GHE','Ghế ăn'),
+    ('PA-TU','Tủ trang trí'),
     ('TV','Tủ tivi'),
     ('KS','Kệ sách'),
 )
@@ -35,18 +38,21 @@ class Product(models.Model):
     description = models.TextField()
     composition = models.TextField(default='')
     prodapp = models.TextField(default='')
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=100)
-    product_image = models.ImageField(upload_to='product')
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=100,null=True)  
+    product_image = models.ImageField(upload_to='product', max_length=10000)
     saving_amount = models.FloatField()
     discount_percentage = models.FloatField()
+
     def __str__(self):
         return self.title
+
     @property
     def saving_amount(self):
         return self.selling_price - self.discount_price if self.selling_price > self.discount_price else 0
+
     @property
     def discount_percentage(self):
-        if self.selling_price > 0: 
+        if self.selling_price > 0:
             return round((self.saving_amount / self.selling_price) * 100, 2)
         return 0
     

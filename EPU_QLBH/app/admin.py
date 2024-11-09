@@ -7,7 +7,28 @@ from django.contrib.auth.models import Group
 
 @admin.register(Product)
 class ProductModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'discount_price', 'category', 'product_image']
+    list_display = ['id', 'product_title', 'discount_price', 'category', 'product_image']
+    search_fields = ['title', 'category', 'id']
+    list_filter = ['category']
+    list_per_page = 10
+
+    # Điều chỉnh fieldsets theo các trường có trong model Product của bạn
+    fieldsets = [
+        ('Thông tin cơ bản', {
+            'fields': ['title', 'description', 'product_image']
+        }),
+        ('Giá', {
+            'fields': ['selling_price', 'discount_price']
+        }),
+        ('Phân loại', {
+            'fields': ['category']  
+        })
+    ]
+
+    def product_title(self, obj):
+        link = reverse("admin:app_product_change", args=[obj.pk])
+        return format_html('<a href="{}">{}</a>', link, obj.title)
+    product_title.short_description = 'Title'
 
 @admin.register(Customer)
 class CustomerModelAdmin(admin.ModelAdmin):
@@ -32,7 +53,7 @@ class OrderPlacedModelAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>',link,obj.customer.name)
     def products(self,obj):
         link = reverse("admin:app_product_change", args=[obj.product.pk])
-        return format_html('<a href="{}">{}</a>',link,obj.product.title)
+        return format_html('<a href="{}">{}</a>',link,obj.product.  title)
     def payments(self,obj):
         link = reverse("admin:app_payment_change", args=[obj.payment.pk])
         return format_html('<a href="{}">{}</a>',link,obj.payment.vnpay_payment_id)
