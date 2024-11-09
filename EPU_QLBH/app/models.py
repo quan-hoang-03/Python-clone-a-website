@@ -2,8 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 CATEGORY_CHOICES=(
-    ('ML','Milk'),
-    ('CZ','Cheese')
+    ('ML','Sofa'),
+    ('CZ','Bàn ghế'),
+    ('BD','Giường ngủ'),
+    ('TG','Tủ giày'),
+    ('BA','Bàn ăn'),
+    ('TV','Tủ tivi'),
+    ('KS','Kệ sách'),
 )
 
 STATE_CHOICES=(
@@ -30,7 +35,7 @@ class Product(models.Model):
     description = models.TextField()
     composition = models.TextField(default='')
     prodapp = models.TextField(default='')
-    category = models.CharField(choices=CATEGORY_CHOICES, max_length=2)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=100)
     product_image = models.ImageField(upload_to='product')
     saving_amount = models.FloatField()
     discount_percentage = models.FloatField()

@@ -1,6 +1,8 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
+
+from django.contrib import admin
 from . import views
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm,PasswordResetForm,PasswordChangeForm,SetPasswordForm
@@ -19,6 +21,8 @@ urlpatterns = [
     path('cart/',views.show_cart,name="showcart"),
     path('checkout/',views.checkout.as_view(),name="checkout"),
     path('search/',views.search,name="search"),
+    path('wishlist/',views.show_wishlist,name="showwishlist"),
+
 
     path('pluscart/',views.plus_cart),
     path('minuscart/',views.minus_cart),
@@ -41,4 +45,9 @@ urlpatterns = [
     path('password-reset-complete/',auth_view.PasswordResetCompleteView.as_view(template_name='app/password_reset_complete.html'),name="password_reset_complete"),
 
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "Quân Hoàng"
+admin.site.site_title = "Quân Hoàng"
+admin.site.site_index_title = "Welcome to Quân Hoàng"
+
     

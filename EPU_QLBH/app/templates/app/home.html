@@ -13,52 +13,337 @@
     </div>
   </div>
 {% endblock banner-slider %}
-{% block information%}
+
+{% comment %} {% block information%}
   <div class="container">
     <div class="row bg-success text-center p-5 text-white border-bottom shadow">
         <h1>Product</h1>
         <small class="fs-5">Các sản phẩm chính hãng được tin dùng</small>
     </div>
   </div>
-{% endblock information%}
+{% endblock information%} {% endcomment %}
+
 {% block main-content %}
+<section class="section" id="section_1236331896">
+  <div class="bg section-bg fill bg-fill bg-loaded"></div>
+  <div class="section-content relative">
+      <div class="row row-collapse row-full-width align-equal design_air" id="row-1884172063">
+          <div id="col-765857186" class="col img_first_left medium-6 small-12 large-6">
+              <div class="col-inner">
+                  <div class="img has-hover img_first_left x md-x lg-x y md-y lg-y" id="image_244427229">
+                      <a href="{% url 'category' 'CZ' %}">
+                          <div class="img-inner image-zoom dark">
+                              <img decoding="async" width="970" height="640" src="https://nhaxinh.com/wp-content/uploads/2024/01/nha-xinh-banner-phong-khach-31-1-24.jpg" alt="">
+                          </div>
+                      </a>
+                  </div>
+                  <div id="text-1170896746" class="text ct_design">
+                      <h2 style="margin-top:14px">Không gian phòng khách</h2>
+                      <p>Phòng khách là không gian chính của ngôi nhà, là nơi sum họp gia đình</p>
+                      <p><a style="color: #A9A9B2; text-decoration: none;" href="{% url 'category' 'CZ' %}">MẪU THIẾT KẾ <i class="fa-solid fa-arrow-right"></i></a></p>
+                  </div>
+              </div>
+          </div>
+          <div id="col-1550693921" class="col first_right medium-6 small-12 large-6">
+              <div class="col-inner">
+                  <div class="img has-hover img_first_right x md-x lg-x y md-y lg-y" id="image_300544254">
+                      <a href="{% url 'category' 'ML' %}">
+                          <div class="img-inner image-zoom dark">
+                              <img decoding="async" width="533" height="600" src="https://nhaxinh.com/wp-content/uploads/2024/01/nha-xinh-do-trang-tri-banner-31-1-24.jpg" alt="">
+                          </div>
+                      </a>
+                  </div>
+                  <div class="ct_design">
+                      <h2 style="margin-top:14px">Đồ trang trí</h2>
+                      <p>Mang lại những nguồn cảm hứng và nét sinh động cho không gian</p>
+                      <p ><a style="color: #A9A9B2; text-decoration: none;" href="{% url 'category' 'ML' %}">KHÁM PHÁ <i class="fa-solid fa-arrow-right"></i></a></p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="section-content relative" style="margin-top:20px">
+      <div class="row row-collapse row-full-width align-equal design_air" id="row-1884172063">
+        <div id="col-1550693921" class="col first_right medium-6 small-12 large-6">
+          <div class="col-inner">
+              <div class="img has-hover img_first_right x md-x lg-x y md-y lg-y" id="image_300544254">
+                  <a href="{% url 'category' 'ML' %}">
+                      <div class="img-inner image-zoom dark">
+                          <img decoding="async" width="533" height="600" src="{% static 'app/images/banner/banner-phong-an-nha-xinh-12-9-22.jpg' %}" alt="">
+                      </div>
+                  </a>
+              </div>
+              <div class="ct_design">
+                  <h2 style="margin-top:14px">Không gian phòng ngủ</h2>
+                  <p>Những mẫu phòng ngủ của Nhà Xinh mang đến cảm giác ấm cúng, gần gũi và thoải mái</p>
+                  <p ><a style="color: #A9A9B2; text-decoration: none;" href="{% url 'category' 'ML' %}">MẪU PHÒNG NGỦ <i class="fa-solid fa-arrow-right"></i></a></p>
+              </div>
+          </div>
+      </div>
+          <div id="col-765857186" class="col img_first_left medium-6 small-12 large-6">
+              <div class="col-inner">
+                  <div class="img has-hover img_first_left x md-x lg-x y md-y lg-y" id="image_244427229">
+                      <a href="{% url 'category' 'CZ' %}">
+                          <div class="img-inner image-zoom dark">
+                              <img decoding="async" width="970" height="640" src="{% static 'app/images/banner/mau-phong-ngu-16-5-23.jpg' %}" alt="">
+                          </div>
+                      </a>
+                  </div>
+                  <div id="text-1170896746" class="text ct_design">
+                      <h2 style="margin-top:14px">Không gian phòng ăn</h2>
+                      <p>Một bữa ăn ngon luôn là mong ước của mỗi gia đình. Không gian phòng ăn đóng vai trò rất quan trọng trong văn hóa Việt</p>
+                      <p><a style="color: #A9A9B2; text-decoration: none;" href="{% url 'category' 'CZ' %}">MẪU PHÒNG ĂN <i class="fa-solid fa-arrow-right"></i></a></p>
+                  </div>
+              </div>
+          </div>
+          
+      </div>
+  </div>
+  <style>
+      #section_1236331896 {
+          padding: 30px 0;
+          background-color: rgba(227, 227, 227, 0.715);
+      }
+      .section-content {
+          max-width: 1200px; /* Giới hạn chiều rộng tối đa */
+          margin: 0 auto; /* Giữa trang */
+          display: flex; /* Sử dụng Flexbox */
+          justify-content: space-between; /* Tách đều hai bên */
+          align-items: flex-start; /* Căn chỉnh phần tử lên trên cùng */
+      }
+      .col-inner {
+          text-align: center; /* Căn giữa nội dung */
+          padding: 15px; /* Thêm khoảng cách xung quanh */
+          border: 1px solid #ddd; /* Thêm viền nhẹ */
+          border-radius: 8px; /* Bo góc cho viền */
+          background-color: #fff; /* Nền trắng cho mỗi cột */
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+      }
+      .ct_design h2 {
+          font-size: 24px; /* Kích thước tiêu đề */
+          margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+          color: #333; /* Màu chữ cho tiêu đề */
+      }
+      .ct_design p {
+          color: rgb(53, 53, 53); /* Màu chữ cho nội dung */
+          margin: 5px 0; /* Khoảng cách trên và dưới */
+      }
+      .img-inner {
+          position: relative; /* Để có thể sử dụng hiệu ứng hover */
+          overflow: hidden; /* Ẩn phần thừa ra ngoài */
+          border-radius: 8px; /* Bo góc cho hình ảnh */
+      }
+      .img-inner.image-zoom:hover {
+          transform: scale(1.05); /* Hiệu ứng phóng to khi hover */
+          transition: transform 0.3s ease; /* Thời gian chuyển đổi */
+      }
+      .img img {
+          width: 100%; /* Đảm bảo hình ảnh luôn đầy đủ chiều rộng */
+          border-radius: 8px; /* Bo góc cho hình ảnh */
+      }
+  </style>
+</section>
+
     <div class="container">
-        <h2 class="text-center">
+        <h2 class="text-center" style="margin-top:10px">
             Các mặt hàng hiện có
         </h2>
         <br></br>
         <div class="row container">
             <div class="col-md-4 col-sm-4 mi-go wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" style="animation-duration:1s;animation-delay:0.6s;animation-name:none;">
                 <div class="goodnesssec buttermilk smbg">
-                    <a href="#">
+                    <a href="{% url 'category' 'ML' %}">
                         <div class="goodnessseccont text-center">
-                            <img src="{% static "app/images/products/buffalo-ghee.png" %}" class="img-responsive center-block" alt="">
-                            <p class="mlkpro">Ghee</p>
+                            <img src="{% static 'app/images/products/sofa.jpg' %}" class="img-responsive center-block" alt="" style="width:310px;height:175px">
+                            <p class="mlkpro">Sofa</p>
                         </div>
                     </a>
-                  </div>
+                </div>
             </div>
             <div class="col-md-4 col-sm-4 mi-go wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" style="animation-duration:1s;animation-delay:0.6s;animation-name:none;">
-              <div class="goodnesssec buttermilk curdbgpro">
-                  <a href="#">
-                      <div class="goodnessseccont text-center">
-                          <img src="{% static "app/images/products/buffalo-ghee.png" %}" class="img-responsive center-block" alt="">
-                          <p class="mlkpro">Ghee</p>
-                      </div>
-                  </a>
+                <div class="goodnesssec buttermilk curdbgpro">
+                    <a href="{% url 'category' 'CZ' %}">
+                        <div class="goodnessseccont text-center">
+                            <img src="{% static 'app/images/products/banghe.jpg' %}" class="img-responsive center-block" alt="" style="width:310px;height:175px">
+                            <p class="mlkpro">Bàn ghế</p>
+                        </div>
+                    </a>
                 </div>
-          </div>
-          <div class="col-md-4 col-sm-4 mi-go wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" style="animation-duration:1s;animation-delay:0.6s;animation-name:none;">
-            <div class="goodnesssec buttermilk buttermilk">
-                <a href="#">
-                    <div class="goodnessseccont text-center">
-                        <img src="{% static "app/images/products/buffalo-ghee.png" %}" class="img-responsive center-block" alt="">
-                        <p class="mlkpro">Ghee</p>
-                    </div>
-                </a>
-              </div>
+            </div>
+            <div class="col-md-4 col-sm-4 mi-go wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s" style="animation-duration:1s;animation-delay:0.6s;animation-name:none;">
+                <div class="goodnesssec buttermilk buttermilk">
+                    <a href="{% url 'category' 'BD' %}">
+                        <div class="goodnessseccont text-center">
+                            <img src="{% static 'app/images/products/giuong.jpg' %}" class="img-responsive center-block" alt="" style="width:310px;height:175px">
+                            <p class="mlkpro">Giường ngủ</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <!-- Phần dịch vụ mới thêm vào -->
+        <div class="wrapper-home-banner-servce mt-5">
+            <div class="container">
+                <div class="flex_content services-pd site-animation">
+                    <div class="services col-md-3">
+                        <div class="img-outer">
+                            <div class="service-img fade-box">
+                                <img width="50" height="50" src="{% static 'app/images/services/vice_item_1_thumb.webp' %}" alt="Giao Hàng & Lắp Đặt">
+                            </div>
+                        </div>
+                        <div class="text">
+                            <div class="title">Giao Hàng & Lắp Đặt</div>
+                            <div class="desc">Miễn Phí</div>
+                        </div>
+                    </div>
+                    
+                    <div class="services col-md-3">
+                        <div class="img-outer">
+                            <div class="service-img fade-box">
+                                <img width="50" height="50" src="{% static 'app/images/services/vice_item_2_thumb.webp' %}" alt="Đổi Trả 1 - 1">
+                            </div>
+                        </div>
+                        <div class="text">
+                            <div class="title">Đổi Trả 1 - 1</div>
+                            <div class="desc">Miễn Phí</div>
+                        </div>
+                    </div>
+                    
+                    <div class="services col-md-3">
+                        <div class="img-outer">
+                            <div class="service-img fade-box">
+                                <img width="50" height="50" src="{% static 'app/images/services/vice_item_3_thumb.webp' %}" alt="Bảo Hành 2 Năm">
+                            </div>
+                        </div>
+                        <div class="text">
+                            <div class="title">Bảo Hành 2 Năm</div>
+                            <div class="desc">Miễn Phí</div>
+                        </div>
+                    </div>
+                    
+                    <div class="services col-md-3">
+                        <div class="img-outer">
+                            <div class="service-img fade-box">
+                                <img width="50" height="50" src="{% static 'app/images/services/vice_item_4_thumb.webp' %}" alt="Tư Vấn Thiết Kế">
+                            </div>
+                        </div>
+                        <div class="text">
+                            <div class="title">Tư Vấn Thiết Kế</div>
+                            <div class="desc">Miễn Phí</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <br></br>
+<style>
+  .wrapper-home-banner-servce {
+    padding: 20px 0;
+}
+
+.flex_content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.services {
+    text-align: center;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.services:hover {
+    transform: translateY(-5px);
+    background-color: #F4F4F7;
+
+}
+
+.service-img {
+    margin-bottom: 15px;
+}
+
+.service-img img {
+    transition: all 0.3s ease;
+}
+
+.service-img:hover img {
+    transform: scale(1.1);
+}
+
+.services .title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.services .desc {
+    color: #28a745;
+}
+
+.fade-box {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.fade-box:hover {
+    opacity: 0.8;
+}
+.mlkpro {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  margin-top: 15px;
+  position: relative;
+  padding-bottom: 10px;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.mlkpro::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background-color: #0D8A47;  /* Màu xanh của MOHO */
+  transition: width 0.3s ease;
+}
+
+/* Hover effect cho container */
+.buttermilk:hover .mlkpro {
+  color: #0D8A47;
+}
+
+.buttermilk:hover .mlkpro::after {
+  width: 60px;
+}
+
+/* Thêm animation cho text khi load */
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.mlkpro {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mlkpro {
+      font-size: 16px;
+  }
+}
+</style>
 {% endblock main-content %}

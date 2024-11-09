@@ -41,22 +41,22 @@
                     <div class="price-section">
                         <div class="price-container">
                             <div class="current-price">
-                                <span class="amount">{{product.discount_price}}</span>
+                                <span class="amount" id="discount-price">{{ product.discount_price }}</span>
                                 <span class="currency">₫</span>
                             </div>
                             {% if product.selling_price > product.discount_price %}
                             <div class="discount-info">
                                 <div class="original-price">
-                                    <del>{{product.selling_price}}₫</del>
+                                    <del id="selling-price">{{ product.selling_price }}</del>₫
                                 </div>
-                                <div class="discount-tag">-{{product.discount_percentage}}%</div>
+                                <div class="discount-tag">-{{ product.discount_percentage }}%</div>
                             </div>
                             {% endif %}
                         </div>
                         {% if product.selling_price > product.discount_price %}
-                        <div class="savings-info">
-                            Tiết kiệm: <span>{{product.saving_amount}}₫</span>
-                        </div>
+                            <div class="savings-info" id="savings-info">
+                                Tiết kiệm: <span id="saving-amount">{{ product.saving_amount }}</span>₫
+                            </div>
                         {% endif %}
                     </div>
 
@@ -406,4 +406,34 @@
     }
 }
 </style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const savingAmountElement = document.getElementById('saving-amount');
+        const amount = parseInt(savingAmountElement.textContent);
+
+        if (!isNaN(amount)) {
+            // Định dạng số với dấu chấm phân cách
+            const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            savingAmountElement.textContent = formattedAmount;
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        const discountPriceElement = document.getElementById('discount-price');
+        const sellingPriceElement = document.getElementById('selling-price');
+        
+        const formatPrice = (priceElement) => {
+            const amount = parseInt(priceElement.textContent);
+            if (!isNaN(amount)) {
+                // Định dạng số với dấu chấm phân cách
+                const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                priceElement.textContent = formattedAmount;
+            }
+        };
+
+        formatPrice(discountPriceElement);
+        if (sellingPriceElement) {
+            formatPrice(sellingPriceElement);
+        }
+    });
+</script>
 {% endblock main-content %}

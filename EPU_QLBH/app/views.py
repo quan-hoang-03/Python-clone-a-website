@@ -11,12 +11,13 @@ from datetime import datetime
 import random
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
-@login_required
+
 def get_banner():
     return {
         'banners': [
-            'app/images/banner/b1.jpg',
+            # 'app/images/banner/b1.jpg',
             'app/images/banner/b2.jpg', 
             'app/images/banner/b3.jpg',
             'app/images/banner/b4.jpg'
@@ -63,18 +64,78 @@ def contact(request):
     
     return render(request, 'app/contact.html', context)
 
+@method_decorator(login_required,name='dispatch')
 class CategoryView(View):
-    def get(self,request,val):
-        product = Product.objects.filter(category=val)
+    def get(self, request, val):
+        # Khởi tạo queryset ban đầu
+        products = Product.objects.filter(category=val)
+        
+        # Lấy danh sách titles cho category này
         title = Product.objects.filter(category=val).values('title').annotate(total=Count('title'))
-        return render(request,"app/category.html",locals())
 
+        # Xử lý tìm kiếm theo tên
+        search_query = request.GET.get('search', '')
+        if search_query:
+            products = products.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+
+        # Xử lý tìm kiếm theo khoảng giá
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        
+        if min_price:
+            try:
+                products = products.filter(discount_price__gte=float(min_price))
+            except ValueError:
+                pass
+        
+        if max_price:
+            try:
+                products = products.filter(discount_price__lte=float(max_price))
+            except ValueError:
+                pass
+
+        # Xử lý sắp xếp
+        sort_by = request.GET.get('sort')
+        if sort_by:
+            if sort_by == 'price_asc':
+                products = products.order_by('discount_price')
+            elif sort_by == 'price_desc':
+                products = products.order_by('-discount_price')
+            elif sort_by == 'name_asc':
+                products = products.order_by('title')
+            elif sort_by == 'name_desc':
+                products = products.order_by('-title')
+
+        # Phân trang
+        from django.core.paginator import Paginator
+        paginator = Paginator(products, 8)  # Hiển thị 8 sản phẩm mỗi trang
+        page_number = request.GET.get('page')
+        product = paginator.get_page(page_number)
+
+        context = {
+            'product': product,
+            'title': title,
+            'current_category': val,
+            'search_query': search_query,
+            'min_price': min_price,
+            'max_price': max_price,
+            'sort_by': sort_by,
+        }
+        
+        return render(request, "app/category.html", context)
+    
+
+@method_decorator(login_required,name='dispatch')
 class CategoryTitle(View):
     def get(self,request,val):
         product = Product.objects.filter(title=val)
         title = Product.objects.filter(category=product[0].category).values('title')
         return render(request,"app/category.html",locals())    
 
+@method_decorator(login_required,name='dispatch')
 class ProductDetail(View):
     def get(self,request,pk):
         product = Product.objects.get(pk=pk)
@@ -98,6 +159,8 @@ class CustomerRegistrationView(View):
             messages.warning(request,"Đăng ký thất bại")
         return render(request,"app/customerregistration.html",locals())
     
+
+@method_decorator(login_required,name='dispatch')
 class ProfileView(View):
     def get(self,request):
         form = CustomerProfileForm()
@@ -120,11 +183,13 @@ class ProfileView(View):
             messages.warning(request,"Lưu thông tin thất bại")
         return render(request,"app/profile.html",locals())
     
+@login_required
 def address(request):
         # Lấy thông tin tài khoản người dùng đang login
         add = Customer.objects.filter(user = request.user)
         return render(request,"app/address.html",locals())
 
+@method_decorator(login_required,name='dispatch')
 class updateAddress(View):
     def get(self,request,id):
         add = Customer.objects.get(id=id)
@@ -145,6 +210,7 @@ class updateAddress(View):
             messages.warning(request,"Lưu thông tin thất bại")
         return redirect("address")
     
+@login_required
 def add_to_cart(request):
     user = request.user
     product_id = request.GET.get('prod_id')
@@ -165,6 +231,8 @@ def add_to_cart(request):
 
     return HttpResponse("Product ID not provided.", status=400)
 
+
+@login_required
 def show_cart(request):
     user = request.user
     cart = Cart.objects.filter(user=user)
@@ -176,6 +244,18 @@ def show_cart(request):
     totalamount = amount + 40
     return render(request,"app/addtocart.html",locals())
 
+@login_required
+def show_wishlist(request):
+    user = request.user
+    totalitem = 0
+    wishlist = 0
+    if request.user.is_authenticated:
+        totalitem = len(Cart.objects.filter(user=request.user))
+        wishlist = len(Wishlist.objects.filter(user=user))
+    product = Wishlist.objects.filter(user=user)
+    return render(request,"app/wishlist.html",locals())
+
+@method_decorator(login_required,name='dispatch')
 class checkout(View):
     def get(self,request):
         user = request.user
@@ -334,6 +414,8 @@ def minus_wishlist(request):
             'message':'Đã xóa khỏi danh mục yêu thích'
         }
         return JsonResponse(data)
+    
+@login_required
 def search(request):
     query = request.GET['search']
     product = Product.objects.filter(Q(title_icontains=query))

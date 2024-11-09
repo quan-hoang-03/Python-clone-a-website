@@ -3,33 +3,205 @@
 {% block title %}Category{% endblock title %}
 
 {% block main-content%}
-    <div class="container my-5">
-        <div class="row">
-            <div class="col-sm-3">
-                {% for val in title %}
-                <a class="list-group-item list-group-item-action" href="{% url 'category-title' val.title %}" aria-current="true">
-                    {{val.title}}
-                </a>
-                {% endfor %}
-            </div>
-            <div class="col-sm-9">
-                <div class="row">
-                    {% for prod in product %}
-                        <div class="col text-center mb-4">
-                            <a href="{% url 'product-detail' prod.id %}" class="btn">
-                                <div>
-                                    <img src="{{prod.product_image.url}}" width="300px" height="200px" />
-                                    <div class="fw-bold">{{prod.title}}</div>
-                                    <div class="fw-bold text-danger">
-                                        Rs.{{prod.discounted_price}}/-
-                                        <small class="fw-light text-decoration-line-through">{{prod.selling_price}}</small>
-                                    </div>
-                                </div>
-                            </a>
+<div class="container my-5">
+    <!-- Phần tìm kiếm -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <!-- Search input -->
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Tìm kiếm sản phẩm..." 
+                                   value="{{ search_query }}">
                         </div>
-                    {% endfor %}
+
+                        <!-- Price range -->
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col">
+                                    <input type="number" name="min_price" class="form-control" 
+                                           placeholder="Giá từ" value="{{ min_price }}">
+                                </div>
+                                <div class="col">
+                                    <input type="number" name="max_price" class="form-control" 
+                                           placeholder="Giá đến" value="{{ max_price }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sort select -->
+                        <div class="col-md-2">
+                            <select name="sort" class="form-select">
+                                <option value="">Sắp xếp</option>
+                                <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>
+                                    Giá tăng dần
+                                </option>
+                                <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>
+                                    Giá giảm dần
+                                </option>
+                                <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>
+                                    Tên A-Z
+                                </option>
+                                <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>
+                                    Tên Z-A
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                            <a href="{% url 'category' current_category %}" class="btn btn-secondary">Đặt lại</a>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Hiển thị sản phẩm -->
+    <div class="row">
+        {% if product %}
+            {% for prod in product %}
+            <div class="col-md-3 mb-4">
+                <div class="card product-card h-100">
+                    <a href="{% url 'product-detail' prod.id %}" class="text-decoration-none">
+                        <img src="{{prod.product_image.url}}" class="card-img-top product-img" alt="{{prod.title}}">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{prod.title}}</h5>
+                            <div class="price-section">
+                                <!-- Thêm data-price để lưu giá gốc -->
+                                <span class="text-danger fw-bold price-format" data-price="{{prod.discount_price}}">
+                                    {{prod.discount_price}}
+                                </span>
+                                {% if prod.selling_price != prod.discount_price %}
+                                    <small class="text-muted text-decoration-line-through price-format" data-price="{{prod.selling_price}}">
+                                        {{prod.selling_price}}
+                                    </small>
+                                    <span class="badge bg-success">
+                                        -{{prod.discount_percentage}}%
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <h3>Không tìm thấy sản phẩm nào</h3>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Phân trang -->
+    {% if product.has_other_pages %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if product.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ product.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                        Trước
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for num in product.paginator.page_range %}
+                {% if product.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                            {{ num }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if product.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ product.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if min_price %}&min_price={{ min_price }}{% endif %}{% if max_price %}&max_price={{ max_price }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                        Tiếp
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.product-img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.price-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto submit khi thay đổi select
+    document.querySelector('select[name="sort"]').addEventListener('change', function() {
+        this.closest('form').submit();
+    });
+
+    // Debounce function
+    function debounce(func, timeout = 500) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+
+    // Auto submit với debounce cho input search và price
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input');
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', debounce(() => {
+            form.submit();
+        }));
+    });
+});
+function formatVNDPrice(price) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(price);
+}
+
+// Chờ DOM load xong
+document.addEventListener('DOMContentLoaded', function() {
+    // Format tất cả phần tử có class price-format
+    const priceElements = document.querySelectorAll('.price-format');
+    priceElements.forEach(element => {
+        // Lấy giá từ data-price
+        const price = parseInt(element.dataset.price);
+        element.textContent = formatVNDPrice(price);
+    });
+});
+</script>
 {% endblock main-content %}
