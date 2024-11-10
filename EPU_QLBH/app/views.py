@@ -452,12 +452,22 @@ def minus_wishlist(request):
     
 @login_required
 def search(request):
-    query = request.GET['search']
-    product = Product.objects.filter(Q(title_icontains=query))
-    totalitem = 0
-    wishitem = 0
-    
-    if request.user.is_authenticated:
-        totalitem = len(Cart.objects.filter(user=request.user))
-        wishitem = len(Wishlist.objects.filter(user=request.user))
-    return render(request,'app/search.html',locals())
+    # Sử dụng get() để tránh lỗi MultiValueDictKeyError
+    # Tìm kiếm tham số có tên 'search' trong request.GET
+    # Nếu không tìm thấy, trả về chuỗi rỗng '' (giá trị mặc định)
+    query = request.GET.get('search', '')
+    # Kiểm tra xem có từ khóa tìm kiếm không
+    if query:
+        # Truy cập vào model Product  Lọc các sản phẩm theo điều kiện
+        # title__icontains: Tìm kiếm không phân biệt hoa thường trong trường title
+        products = Product.objects.filter(Q(title__icontains=query))
+    else:
+        # Trả về QuerySet rỗng khi không có từ khóa tìm kiếm tránh việc trả về None hoặc lỗi
+        products = Product.objects.none()  # Trả về QuerySet rỗng nếu không có query
+
+    context = {
+        'query': query,# Từ khóa tìm kiếm
+        'products': products# Kết quả tìm kiếm
+    }
+
+    return render(request, 'app/search.html', context)
