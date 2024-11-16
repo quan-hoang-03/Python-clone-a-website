@@ -26,8 +26,10 @@ urlpatterns = [
 
     path('pluscart/',views.plus_cart),
     path('minuscart/',views.minus_cart),
-    path('removecart/',views.remove_cart),
+    path('removecart/',views.remove_cart,name='removecart'),
     path('payment/', views.payment, name='payment'),
+    path('payment_success/<str:order_id>/', views.payment_success, name='payment_success'),
+    path('payment_return/', views.payment_return, name='payment_return'),
     path('pluswishlist/',views.plus_wishlist),
     path('minuswishlist/',views.minus_wishlist),
 

@@ -5,12 +5,12 @@
 {% block main-content %}
 <div class="container py-5">
     {% if cart %}
-    <h1 class="text-center mb-5 fw-bold text-primary">Giỏ hàng của bạn</h1>
+    <h1 class="text-center mb-5 fw-bold">Giỏ hàng của bạn</h1>
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-body p-4">
-                    <h3 class="card-title mb-4 fw-bold">Cart Items</h3>
+                    <h3 class="card-title mb-4 fw-bold">Các mặt hàng trong giỏ hàng</h3>
                     {% for item in cart %}
                     <div class="row mb-4 align-items-center">
                         <div class="col-md-3">
@@ -38,9 +38,9 @@
                                         </button>
                                     </div>
                                 </div>
-                                
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <button class="btn btn-sm btn-outline-danger remove-cart" pid="{{item.product.id}}">
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto cart-item">
+                                    <button class="btn btn-sm btn-outline-danger remove-cart" pid="{{ item.product.id }}">
                                         <i class="fas fa-trash-alt me-2"></i>Xóa
                                     </button>
                                     <p class="h5 mb-0 text-primary fw-bold price-format" data-price="{{ item.product.discount_price }}">

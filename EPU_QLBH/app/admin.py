@@ -43,7 +43,15 @@ class CartModelAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentModelAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'amount', 'vnpay_order_id','vnpay_payment_status','vnpay_payment_id','paid']
+    list_display = ['user', 'amount', 'order_id', 'vnpay_order_id', 
+                    'vnpay_payment_status', 'vnpay_payment_id', 'paid', 'created_at']
+    list_filter = ['vnpay_payment_status', 'created_at']
+    search_fields = ['order_id', 'vnpay_order_id', 'user__username']
+    readonly_fields = ['paid']
+
+    def paid(self, obj):
+        return obj.paid
+    paid.boolean = True  # Hiển thị dưới dạng icon boolean trong admin
 
 @admin.register(OrderPlaced)
 class OrderPlacedModelAdmin(admin.ModelAdmin):

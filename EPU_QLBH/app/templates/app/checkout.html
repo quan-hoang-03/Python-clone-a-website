@@ -41,7 +41,7 @@
             <small>Điều khoản và Điều kiện: Lorem ipsum dolor sit amet, một phần của văn bản được sử dụng để thể hiện nội dung. Những điều này thường liên quan đến trách nhiệm pháp lý, quyền lợi và nghĩa vụ của người dùng</small>
         </div>
         <div class="col-sm-4 offset-sm-1">
-            <h4>Select Shipping Address</h4>
+            <h4>Chọn địa chỉ giao hàng</h4>
             <hr>
             <form method="post" id="myform">
                 {% csrf_token %}
@@ -61,13 +61,18 @@
                 </div>
                 {% endfor %}
                 <div class="form-check mb-3">
-                    <label for="totalamount" class="form-label">Total Amount:</label>
-                    <input type="number" class="form-control" name="totamount" value="{{totalamount}}" readonly
+                    <label for="totalamount" class="form-label">Tổng số tiền:</label>
+                    <input type="text" class="form-control" name="totamount" value="{{totalamount}}" readonly
                            data-price="{{totalamount}}"/>
                 </div>
                 <div class="text-end">
-                    <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Tiếp tục</button>
-                    <button type="submit" formaction="{% url 'payment' %}" class="btn btn-warning mt-3 px-5 fw-bold">Thanh toán</button>
+                    <form action="{% url 'payment' %}" method="post">
+                        <!-- Truyền totalamount qua hidden input -->
+                        <input type="hidden" name="totalamount" value="{{ totalamount }}">
+
+                        <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Thanh toán</button>
+                        {% csrf_token %}
+                    </form>
                 </div>
             </form>
         </div>
@@ -120,5 +125,15 @@
             element.textContent = formatVNDPrice(price);
         });
     });
+    function formatVND(number) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(number);
+    }
+
+    // Format số trong input
+    const input = document.querySelector('input[name="totamount"]');
+    input.value = formatVND(input.dataset.price);
 </script>
 {% endblock main-content %}

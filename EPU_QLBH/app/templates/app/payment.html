@@ -1,6 +1,6 @@
 {% extends 'app/base.html' %}
 {% load static %}
-{% block title %}Payment{% endblock title %}
+{% block title %}Payment{% endblock %}
 
 {% block main-content %}
 <div class="container py-5">
@@ -8,24 +8,11 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">{{ title }}</h3>
+                    <h3 class="card-title mb-0">Thanh toán</h3>
                 </div>
                 <div class="card-body">
-                    <form action="{% url 'payment' %}" id="create_form" method="post" class="needs-validation" novalidate>
+                    <form action="{% url 'payment' %}" method="post" id="payment-form" class="needs-validation" novalidate>
                         <div class="row g-3">
-                            <!-- Order Type -->
-                            <div class="col-12">
-                                <div class="form-floating mb-3">
-                                    <select name="order_type" id="order_type" class="form-select">
-                                        <option value="topup">Nạp tiền điện thoại</option>
-                                        <option value="billpayment">Thanh toán hóa đơn</option>
-                                        <option value="fashion">Thời trang</option>
-                                        <option value="other">Khác - Xem thêm tại VNPAY</option>
-                                    </select>
-                                    <label for="order_type">Loại hàng hóa</label>
-                                </div>
-                            </div>
-
                             <!-- Order ID -->
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
@@ -37,7 +24,7 @@
                             <!-- Amount -->
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input class="form-control" id="amount" name="amount" type="number" value="10000" min="10000" step="1000"/>
+                                    <input type="text" class="form-control" id="totamount" name="amount" value="{{ totalamount }}" readonly/>
                                     <label for="amount">Số tiền</label>
                                 </div>
                             </div>
@@ -45,7 +32,7 @@
                             <!-- Description -->
                             <div class="col-12">
                                 <div class="form-floating mb-3">
-                                    <textarea class="form-control" id="order_desc" name="order_desc" style="height: 100px">Thanh toán đơn hàng thời gian : {% now "Y-m-d H:i:s" %}</textarea>
+                                    <textarea class="form-control" id="order_desc" name="order_desc" style="height: 100px">Thanh toán đơn hàng thời gian: {% now "Y-m-d H:i:s" %}</textarea>
                                     <label for="order_desc">Nội dung thanh toán</label>
                                 </div>
                             </div>
@@ -59,23 +46,7 @@
                                             <option value="NCB">Ngan hang NCB</option>
                                             <option value="AGRIBANK">Ngan hang Agribank</option>
                                             <option value="SCB">Ngan hang SCB</option>
-                                            <option value="SACOMBANK">Ngan hang SacomBank</option>
-                                            <option value="EXIMBANK">Ngan hang EximBank</option>
-                                            <option value="MSBANK">Ngan hang MSBANK</option>
-                                            <option value="NAMABANK">Ngan hang NamABank</option>
-                                            <option value="VIETINBANK">Ngan hang Vietinbank</option>
-                                            <option value="VIETCOMBANK">Ngan hang VCB</option>
-                                            <option value="HDBANK">Ngan hang HDBank</option>
-                                            <option value="DONGABANK">Ngan hang Dong A</option>
-                                            <option value="TPBANK">Ngân hàng TPBank</option>
-                                            <option value="OJB">Ngân hàng OceanBank</option>
-                                            <option value="BIDV">Ngân hàng BIDV</option>
-                                            <option value="TECHCOMBANK">Ngân hàng Techcombank</option>
-                                            <option value="VPBANK">Ngan hang VPBank</option>
-                                            <option value="MBBANK">Ngan hang MBBank</option>
-                                            <option value="ACB">Ngan hang ACB</option>
-                                            <option value="OCB">Ngan hang OCB</option>
-                                            <option value="IVB">Ngan hang IVB</option>
+                                            <!-- Add other banks here -->
                                         </optgroup>
                                         <optgroup label="Thanh toán quốc tế">
                                             <option value="VISA">Thanh toán qua VISA/MASTER</option>
@@ -112,61 +83,11 @@
     </div>
 </div>
 
-<style>
-    .card {
-        border: none;
-        border-radius: 15px;
-        overflow: hidden;
-    }
-    
-    .card-header {
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
-        padding: 1.5rem;
-    }
-    
-    .card-title {
-        font-weight: 600;
-        font-size: 1.5rem;
-    }
-    
-    .form-floating > .form-control,
-    .form-floating > .form-select {
-        border-radius: 10px;
-        border: 1px solid #dee2e6;
-    }
-    
-    .form-floating > .form-control:focus,
-    .form-floating > .form-select:focus {
-        border-color: #86b7fe;
-        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
-        border: none;
-        padding: 12px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        transition: transform 0.2s;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    .form-control:read-only {
-        background-color: #f8f9fa;
-    }
-    
-    optgroup {
-        font-weight: 600;
-    }
-    
-    @media (max-width: 768px) {
-        .container {
-            padding: 1rem;
-        }
-    }
-</style>
-{% endblock main-content %}
+<script>
+    // Định dạng số tiền VNĐ
+    const totalAmountInput = document.getElementById("totamount");
+    let totalAmount = totalAmountInput.value;
+    totalAmount = parseFloat(totalAmount).toLocaleString('vi-VN');  // Định dạng số theo kiểu Việt Nam
+    totalAmountInput.value = totalAmount + " VNĐ";
+</script>
+{% endblock %}

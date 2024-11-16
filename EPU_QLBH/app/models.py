@@ -77,12 +77,32 @@ class Cart(models.Model):
         return self.quantity * self.product.discount_price
     
 class Payment(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('PENDING', 'Chờ thanh toán'),
+        ('COMPLETED', 'Đã thanh toán'),
+        ('FAILED', 'Thanh toán thất bại'),
+    ]
+    
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.FloatField()
-    vnpay_order_id = models.CharField(max_length=100, blank=True, null=True) 
-    vnpay_payment_status = models.CharField(max_length=100, blank=True, null=True) 
-    vnpay_payment_id = models.CharField(max_length=100, blank=True, null=True)  
-    paid = models.BooleanField(default=False) 
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    order_id = models.CharField(max_length=100, unique=True)
+    vnpay_payment_id = models.CharField(max_length=50, blank=True, null=True)
+    vnpay_order_id = models.CharField(max_length=50, blank=True, null=True)
+    vnpay_payment_status = models.CharField(
+        max_length=20, 
+        choices=PAYMENT_STATUS_CHOICES,
+        default='PENDING'
+    )
+    bank_code = models.CharField(max_length=20, blank=True, null=True)
+    order_desc = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    @property
+    def paid(self):
+        return self.vnpay_payment_status == 'COMPLETED'
+    
+    def __str__(self):
+        return f"Payment {self.order_id} - {self.user.username}"
 
 class OrderPlaced(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)

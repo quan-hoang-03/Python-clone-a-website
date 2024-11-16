@@ -74,7 +74,7 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <li><a class="dropdown-item" href="{% url 'profile' %}">Xem trang cá nhân</a></li>
-                  <li><a class="dropdown-item" href="#">Đặt hàng</a></li>
+                  <li><a class="dropdown-item" href="{% url 'showcart' %}">Đặt hàng</a></li>
                   <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Đổi mật khẩu</a></li>
                   {% comment %} Django chỉ cho phép phương thức POST cho logout để đảm bảo an toàn {% endcomment %}
                   <li>

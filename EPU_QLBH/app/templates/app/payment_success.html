@@ -1,0 +1,26 @@
+{% extends 'app/base.html' %}
+
+{% block title %}Thanh Toán Thành Công{% endblock %}
+
+{% block main-content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="card-title mb-0">Thanh toán thành công</h3>
+                </div>
+                <div class="card-body">
+                    <h5>Đơn hàng của bạn đã được thanh toán thành công!</h5>
+                    <p>Mã đơn hàng: {{ order.order_id }}</p>
+                    <p>Số tiền thanh toán: {{ amount|floatformat:0 }} VNĐ</p>
+                    <p>Thời gian thanh toán: {{ order.payment_date }}</p>
+                    <p>Trạng thái: <span class="text-success">Đã thanh toán</span></p>
+
+                    <a href="/" class="btn btn-primary">Quay lại trang chủ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
