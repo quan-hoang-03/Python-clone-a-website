@@ -24,7 +24,7 @@
                             <!-- Amount -->
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="totamount" name="amount" value="{{ totalamount }}" readonly/>
+                                    <input type="text" class="form-control" id="totalamount" name="amount" value="{{ totalamount }}" readonly/>
                                     <label for="amount">Số tiền</label>
                                 </div>
                             </div>
@@ -72,7 +72,7 @@
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-credit-card me-2"></i>
-                                Thanh toán
+                                <a href="{% url 'payment_success' %}" style="color:#fff;text-decoration:none">Thanh toán khi nhận hàng</a>
                             </button>
                         </div>
                         {% csrf_token %}
@@ -89,5 +89,6 @@
     let totalAmount = totalAmountInput.value;
     totalAmount = parseFloat(totalAmount).toLocaleString('vi-VN');  // Định dạng số theo kiểu Việt Nam
     totalAmountInput.value = totalAmount + " VNĐ";
+    
 </script>
 {% endblock %}

@@ -13,8 +13,10 @@
                             <img src="{{prod.product.product_image.url}}" width="300px" height="200px" />
                             <div class="fw-bold">{{prod.product.title}}</div>
                             <div class="fw-bold text-danger">
-                                {{prod.product.discounted_price}}/-
-                                <small class="fw-light text-decoration-line-through">{{prod.product.selling_price}}</small>
+                                <span class="price">{{prod.product.discount_price}}</span>
+                                <small class="fw-light text-decoration-line-through">
+                                    <span class="price">{{prod.product.selling_price}}</span>
+                                </small>
                             </div>
                         </div>
                     </a>
@@ -24,4 +26,15 @@
         </div>
     </div>
 </div>
+<script>
+    // Format tất cả các phần tử có class 'price'
+    document.querySelectorAll('.price').forEach(element => {
+        const number = parseFloat(element.textContent);
+        const formatted = new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(number);
+        element.textContent = formatted;
+    });
+</script>
 {% endblock main-content %}

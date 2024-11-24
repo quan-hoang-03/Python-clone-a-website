@@ -2,7 +2,7 @@ from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.views import View
-from .models import Customer, Product,Cart,Wishlist,OrderPlaced
+from .models import Customer, Product, Cart, Wishlist, OrderPlaced, Payment
 from .forms import CustomerRegistrationForm,CustomerProfileForm,PaymentForm
 from django.contrib import messages
 from django.db.models import Q
@@ -13,6 +13,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse
+from django.db import connection
+import logging
 
 
 def get_banner():
@@ -323,85 +325,70 @@ def hmacsha512(key, data):
     return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest() 
  
 def payment(request):
+    # statistic_order()
     totalamount = request.GET.get('totalamount', 0)
-
+    # if request.method != 'POST':
+    #     raise Exception('method not supported')
     if request.method == 'POST':
         form = PaymentForm(request.POST)
-        if form.is_valid():
-            try:
-                with transaction.atomic():  # Đảm bảo tính nhất quán của dữ liệu
-                    # Lấy dữ liệu từ form
-                    order_type = form.cleaned_data.get('order_type', 'billpayment')
-                    order_id = form.cleaned_data['order_id']
-                    amount = Decimal(form.cleaned_data['amount'].replace(',', ''))  # Chuyển đổi chuỗi sang số
-                    order_desc = form.cleaned_data['order_desc']
-                    bank_code = form.cleaned_data['bank_code']
-                    language = form.cleaned_data['language']
-                    ipaddr = get_client_ip(request)
+        payment_data = dict(form.data)
+        logging.debug('[payment] form valid')
+        try:
+            # with transaction.atomic():  # Đảm bảo tính nhất quán của dữ liệu
+                # Lấy dữ liệu từ form
+            logging.debug('[payment] start transaction')
+            order_type = payment_data.get('order_type', 'billpayment')
+            order_id = payment_data['order_id'][-1]
+            amount = float(payment_data['amount'][-1].replace('.', '').replace('VNĐ', '').strip(" "))  # Chuyển đổi chuỗi sang số
+            order_desc = payment_data['order_desc'][-1]
+            bank_code = payment_data['bank_code'][-1]
+            language = payment_data['language'][-1]
+            ipaddr = get_client_ip(request)
 
-                    # Tạo payment record
-                    payment = Payment.objects.create(
-                        user=request.user,
-                        amount=amount,
-                        order_id=order_id,
-                        vnpay_payment_status='PENDING',
-                        bank_code=bank_code,
-                        order_desc=order_desc
-                    )
+            # Tạo payment record
+            logging.debug('[payment] create payment')
+            payment = Payment.objects.create(
+                user=request.user,
+                amount=amount,
+                order_id=order_id,
+                vnpay_payment_status='PENDING',
+                bank_code=bank_code,
+                order_desc=order_desc
+            )
+            logging.debug('[payment] done create payment')
+            # Lấy cart items và tạo OrderPlaced records
+            cart_items = Cart.objects.filter(user=request.user)
+            customer = Customer.objects.get(user=request.user)
 
-                    # Lấy cart items và tạo OrderPlaced records
-                    cart_items = Cart.objects.filter(user=request.user)
-                    customer = Customer.objects.get(user=request.user)
+            for cart_item in cart_items:
+                OrderPlaced.objects.create(
+                    user=request.user,
+                    customer=customer,
+                    product=cart_item.product,
+                    quantity=cart_item.quantity,
+                    status='Pending',
+                    payment=payment
+                )
 
-                    for cart_item in cart_items:
-                        OrderPlaced.objects.create(
-                            user=request.user,
-                            customer=customer,
-                            product=cart_item.product,
-                            quantity=cart_item.quantity,
-                            status='Pending',
-                            payment=payment
-                        )
+                
 
-                    # Cấu hình VNPay
-                    vnp = vnpay()
-                    vnp.requestData['vnp_Version'] = '2.1.0'
-                    vnp.requestData['vnp_Command'] = 'pay'
-                    vnp.requestData['vnp_TmnCode'] = settings.VNPAY_TMN_CODE
-                    vnp.requestData['vnp_Amount'] = int(amount * 100)
-                    vnp.requestData['vnp_CurrCode'] = 'VND'
-                    vnp.requestData['vnp_TxnRef'] = order_id
-                    vnp.requestData['vnp_OrderInfo'] = order_desc
-                    vnp.requestData['vnp_OrderType'] = order_type
-                    vnp.requestData['vnp_Locale'] = language
-                    if bank_code:
-                        vnp.requestData['vnp_BankCode'] = bank_code
-                    vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')
-                    vnp.requestData['vnp_IpAddr'] = ipaddr
-                    vnp.requestData['vnp_ReturnUrl'] = settings.VNPAY_RETURN_URL
+                # Xóa giỏ hàng
+                cart_items.delete()
 
-                    # Xóa giỏ hàng
-                    cart_items.delete()
+                
+                return redirect('payment_success', order_id=order_id)
 
-                    # Tạo URL thanh toán VNPay
-                    vnpay_payment_url = vnp.get_payment_url(
-                        settings.VNPAY_PAYMENT_URL,
-                        settings.VNPAY_HASH_SECRET_KEY
-                    )
-
-                    # Chuyển hướng đến trang thanh toán VNPay
-                    return redirect('payment_success', order_id=order_id)
-
-            except Customer.DoesNotExist:
-                messages.error(request, "Không tìm thấy thông tin khách hàng!")
-                return redirect('profile')
-            except Exception as e:
-                messages.error(request, f"Có lỗi xảy ra: {str(e)}")
-                return render(request, "app/payment.html", {
-                    "totalamount": totalamount,
-                    "form": form
-                })
+        except Customer.DoesNotExist:
+            messages.error(request, "Không tìm thấy thông tin khách hàng!")
+            return redirect('profile')
+        except Exception as e:
+            messages.error(request, f"Có lỗi xảy ra: {str(e)}")
+            return render(request, "app/payment.html", {
+                "totalamount": totalamount,
+                "form": form
+            })
     else:
+        
         form = PaymentForm(initial={'amount': totalamount})
         return render(request, "app/payment.html", {
             "totalamount": totalamount,
@@ -409,10 +396,74 @@ def payment(request):
         })
     
     # Đảm bảo trả về response ngay cả khi không vào điều kiện trên
-    return render(request, "app/payment.html", {
+    return render(request, "app/payment_success.html", {
         "totalamount": totalamount,
         "form": form
     })
+
+def statistics_dashboard(request):
+    # Query số lượng đơn hàng theo tháng
+    query = """
+    SELECT s.month, count(1) order_quantity FROM (
+        SELECT *,
+        strftime('%m', created_at) as month,
+        strftime('%Y', created_at) as year
+        FROM app_payment
+    ) as s
+    WHERE s.year = '2024'
+    GROUP BY s.month
+    """
+    
+    # Query tổng doanh thu theo tháng
+    revenue_query = """
+    SELECT s.month, SUM(amount) total_revenue FROM (
+        SELECT *,
+        strftime('%m', created_at) as month,
+        strftime('%Y', created_at) as year
+        FROM app_payment
+    ) as s
+    WHERE s.year = '2024'
+    GROUP BY s.month
+    """
+    
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        order_results = cursor.fetchall()
+        
+        cursor.execute(revenue_query)
+        revenue_results = cursor.fetchall()
+    
+    # Chuyển đổi kết quả query thành dict
+    order_dict = {x[0]: x[1] for x in order_results}
+    revenue_dict = {x[0]: float(x[1]) for x in revenue_results}
+    
+    # Tạo danh sách đầy đủ 12 tháng
+    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    month_names = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 
+                   'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12']
+    
+    # Tạo dữ liệu cho bảng
+    order_table_data = [(month_names[int(month) - 1], order_dict.get(month, 0), revenue_dict.get(month, 0)) 
+                        for month in months]
+    
+    # Tính tổng số đơn và doanh thu
+    total_orders = sum(order_dict.values())
+    total_revenue = sum(revenue_dict.values())
+    
+    # Tính trung bình
+    avg_orders = total_orders / len([x for x in order_dict.values() if x > 0]) if total_orders > 0 else 0
+    
+    context = {
+        'months': month_names,
+        'orders_data': [order_dict.get(month, 0) for month in months],
+        'revenue_data': [revenue_dict.get(month, 0) for month in months],
+        'total_orders': total_orders,
+        'total_revenue': total_revenue,
+        'avg_orders': round(avg_orders, 2),
+        'order_table_data': order_table_data,
+    }
+    
+    return render(request, 'app/statistic.html', context)
 
 
 def payment_return(request):
@@ -449,9 +500,8 @@ def payment_return(request):
             messages.error(request, "Không tìm thấy thông tin thanh toán!")
             return redirect('home')
         
-def payment_success(request, order_id):
+def payment_success(request):
     return render(request, 'app/payment_success.html', {
-        'order_id': order_id
     })
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -469,7 +519,7 @@ while len(n_str) < 12:
 def  plus_cart(request):
     if request.method == 'GET':
         prod_id = request.GET['prod_id']
-        c = Cart.objects.get(Q(product=prod_id)& Q(user = request.user))
+        c = Cart.objects.get(Q(product=prod_id) & Q(user = request.user))
         c.quantity +=1
         c.save()
         user  = request.user

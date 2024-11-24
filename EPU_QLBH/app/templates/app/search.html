@@ -19,7 +19,7 @@
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ product.title }}</h5>
-                            <p class="fw-bold">Giá: {{ product.selling_price }} đ</p>
+                            <p class="fw-bold">Giá: <span class="price">{{ product.selling_price }}</span>₫</p>
                             <a href="{% url 'product-detail' product.id %}" class="btn btn-primary">Xem chi tiết</a>
                         </div>
                     </div>
@@ -35,4 +35,17 @@
         </div>
     </div>
 </div>
+<script>
+    function formatVND(amount) {
+        return amount.toString().split('').reverse().reduce((prev, next, index) => {
+            return ((index % 3) ? next : (next + '.')) + prev;
+        });
+    }
+
+    // Format tất cả các phần tử có class 'price'
+    document.querySelectorAll('.price').forEach(element => {
+        const price = parseInt(element.textContent);
+        element.textContent = formatVND(price);
+    });
+</script
 {% endblock main-content %}

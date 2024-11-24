@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Product,Customer,Cart,Payment,OrderPlaced,Wishlist
+from .models import Product , Customer , Cart , Payment , OrderPlaced ,Wishlist
 from django.urls import reverse
 from django.utils.html import format_html
 from django.contrib.auth.models import Group
+from django.template.response import TemplateResponse
+from django.db import connection
 
 
 @admin.register(Product)
@@ -72,5 +74,4 @@ class WishlistModelAdmin(admin.ModelAdmin):
     def products(self,obj):
         link = reverse("admin:app_product_change", args=[obj.product.pk])
         return format_html('<a href="{}">{}</a>',link,obj.product.title)
-    
 admin.site.unregister(Group)
